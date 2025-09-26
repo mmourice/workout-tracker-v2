@@ -1,11 +1,7 @@
 import { defineConfig } from "vite";
-import react from "@vitejs/plugin-react";
-
-// CHANGE this to your repository name
-const repo = "workout-tracker-v2";
+import path from "path";
 
 export default defineConfig({
-  plugins: [react()],
-  base: `/${repo}/`,
-  build: { outDir: "dist" }
+  base: "/workout-tracker-v2/", // <-- REQUIRED for GitHub Pages (owner.github.io/repo)
+  resolve: { alias: { "@": path.resolve(__dirname, "src") } }
 });
