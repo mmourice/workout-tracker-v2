@@ -1,55 +1,36 @@
 import React from "react";
-import { Routes, Route, Link, useNavigate } from "react-router-dom";
+import { Routes, Route, Link } from "react-router-dom";
 import Session from "./pages/Session.jsx";
 import Plan from "./pages/Plan.jsx";
 import Exercises from "./pages/Exercises.jsx";
 import History from "./pages/History.jsx";
 import Settings from "./pages/Settings.jsx";
-import "./modern.css";
 
-const NavBtn = ({to, children})=>(
-  <Link to={to} className="btn">{children}</Link>
-);
-
-const Dashboard = ()=>(
-  <div className="container">
-    <h1 className="app-title">Workout Tracker</h1>
-    <div className="row">
-      <NavBtn to="/session" className="btn primary">Session</NavBtn>
-      <NavBtn to="/plan">Plan</NavBtn>
-      <NavBtn to="/exercises">Exercises</NavBtn>
-      <NavBtn to="/history">History</NavBtn>
-      <NavBtn to="/settings">Settings</NavBtn>
-    </div>
-  </div>
-);
-
-const Shell = ({children})=>{
-  const nav = useNavigate();
+function Home() {
   return (
-    <div className="container">
-      <h1 className="app-title">Workout Tracker</h1>
-      <div className="row" style={{gap:12, marginBottom:16}}>
-        <Link to="/session" className="btn">Session</Link>
-        <Link to="/plan" className="btn">Plan</Link>
-        <Link to="/exercises" className="btn">Exercises</Link>
-        <Link to="/history" className="btn">History</Link>
-      </div>
-      {children}
+    <div className="home">
+      <h1>Workout Tracker</h1>
+      <nav className="home-grid">
+        <Link className="pill" to="/session">Session</Link>
+        <Link className="pill" to="/plan">Plan</Link>
+        <Link className="pill" to="/exercises">Exercises</Link>
+        <Link className="pill" to="/history">History</Link>
+        <Link className="pill" to="/settings">Settings</Link>
+      </nav>
     </div>
   );
-};
+}
 
-export default function App(){
+export default function App() {
   return (
     <Routes>
-      <Route path="/" element={<Dashboard/>}/>
-      <Route path="/session" element={<Shell><Session/></Shell>} />
-      <Route path="/plan" element={<Shell><Plan/></Shell>} />
-      <Route path="/exercises" element={<Shell><Exercises/></Shell>} />
-      <Route path="/history" element={<Shell><History/></Shell>} />
-      <Route path="/settings" element={<Shell><Settings/></Shell>} />
-      <Route path="*" element={<Dashboard/>}/>
+      <Route path="/" element={<Home />} />
+      <Route path="/session" element={<Session />} />
+      <Route path="/plan" element={<Plan />} />
+      <Route path="/exercises" element={<Exercises />} />
+      <Route path="/history" element={<History />} />
+      <Route path="/settings" element={<Settings />} />
+      <Route path="*" element={<Home />} />
     </Routes>
   );
 }
