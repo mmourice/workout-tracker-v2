@@ -1,0 +1,38 @@
+/* background */
+html,body,#root{height:100%}
+body{
+  color:var(--text);
+  background: radial-gradient(1200px 600px at 20% 0%, #1b1326 0%, #0a0a0d 60%);
+  font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Inter, "Helvetica Neue", Arial, "Apple Color Emoji","Segoe UI Emoji";
+}
+
+/* layout */
+.shell{min-height:100%; display:flex; flex-direction:column;}
+.hero{padding:24px 20px 8px}
+.title{line-height:0.95; margin:0 0 16px; font-weight:800; font-size:clamp(36px, 7vw, 64px)}
+.content{padding: 0 20px 80px}
+
+/* pills */
+.home-grid{display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:14px; max-width:560px}
+.pill{display:inline-flex; align-items:center; justify-content:center;
+  padding:14px 20px; border-radius:999px; text-decoration:none; font-weight:600; border:1px solid var(--ring)}
+.pill--ghost{background:transparent; color:var(--text)}
+.pill--active{background:var(--brand); color:#1a1a1a; border-color:transparent}
+
+/* cards */
+.card{background: linear-gradient(180deg, var(--card) 0%, var(--card-2) 100%);
+  border:1px solid var(--ring); border-radius: var(--radius); padding:16px; box-shadow: 0 10px 30px rgba(0,0,0,.35);}
+
+/* inputs */
+.input{width:100%; padding:14px 16px; border-radius:14px; background:#2a2434; border:1px solid #3a3147; color:var(--text)}
+.input::placeholder{color:#9087a1}
+
+/* grid for sets */
+.set-grid{display:grid; grid-template-columns:1fr 1fr; gap:14px}
+.set-card{background:#201a2b; border:1px solid var(--ring); border-radius:16px; padding:14px; position:relative}
+.set-title{color:#ff7c2b; font-weight:700; margin:0 0 10px}
+.xbtn{position:absolute; top:8px; right:8px; background:#382b48; border:1px solid #4a3a5e; width:34px; height:34px; border-radius:999px; color:#ddd}
+.toolbar{display:flex; align-items:center; gap:10px; margin:12px 0 2px}
+.btn{display:inline-flex; gap:8px; align-items:center; justify-content:center; padding:10px 14px; border-radius:999px; border:1px solid var(--ring); background:#201a2b; color:var(--text)}
+.btn--brand{background:var(--brand); color:#1b1b1b; border-color:transparent}
+.h1{font-size:28px; font-weight:800; margin:0 0 12px}
