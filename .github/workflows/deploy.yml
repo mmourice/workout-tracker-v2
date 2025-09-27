@@ -24,10 +24,12 @@ jobs:
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: '20'
+          cache: 'npm'
 
-      - name: Install deps
-        run: npm install || npm i
+      # IMPORTANT: use npm install (not npm ci) because we don't rely on package-lock.json
+      - name: Install dependencies
+        run: npm install
 
       - name: Build
         run: npm run build
