@@ -1,3 +1,13 @@
+// src/pages/Session.jsx
+import React from "react";
+
+export default function Session() {
+  return (
+    <div style={{ padding: "24px" }}>
+      <h2>Session</h2>
+    </div>
+  );
+}
 import React, { useMemo, useState } from "react";
 import { useStore, getExerciseById } from "../store.jsx";
 import { Link } from "react-router-dom";
