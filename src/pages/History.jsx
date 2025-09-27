@@ -1,44 +1,73 @@
 import React, { useMemo, useState } from "react";
-import { useStore } from "../store.jsx";
-import { TrashIcon } from "../Icons.jsx";
+import { useStore, getExerciseById } from "../store.jsx";
 
-export default function History(){
-  const { history, deleteHistory } = useStore();
-  const exercises = useMemo(()=> [...new Set(history.map(h=>h.exercise))], [history]);
-  const [filter,setFilter] = useState(exercises[0] || "");
+export default function History() {
+  const { state, deleteLog } = useStore();
+  const [exerciseFilter, setExerciseFilter] = useState("all");
+  const [onlyLast, setOnlyLast] = useState(false);
 
-  const rows = history.filter(h=> !filter || h.exercise===filter);
+  const options = useMemo(() => [
+    { id: "all", name: "All" },
+    ...state.exercises.map(e => ({ id: e.id, name: e.name }))
+  ], [state.exercises]);
+
+  const filtered = useMemo(() => {
+    let arr = state.logs;
+    if (exerciseFilter !== "all") {
+      arr = arr.filter(log => log.entries.some(en => en.exerciseId === exerciseFilter));
+    }
+    if (onlyLast && exerciseFilter !== "all") {
+      // group by date; pick the most recent that contains this exercise
+      const first = arr.find(Boolean);
+      return first ? [first] : [];
+    }
+    return arr;
+  }, [state.logs, exerciseFilter, onlyLast]);
 
   return (
-    <div>
-      <div className="label">Exercise</div>
-      <div className="chips">
-        {exercises.map(name=>(
-          <button key={name} className={`chip ${filter===name?'active':''}`} onClick={()=>setFilter(name)}>{name}</button>
+    <div className="container">
+      <h1 className="app-title">History</h1>
+
+      <div className="row gap wrap">
+        {options.map(opt => (
+          <button
+            key={opt.id}
+            className={`chip ${exerciseFilter===opt.id ? "chip-active" : ""}`}
+            onClick={()=>setExerciseFilter(opt.id)}
+          >
+            {opt.name}
+          </button>
         ))}
+        <button className={`chip ${onlyLast ? "chip-active" : ""}`} onClick={()=>setOnlyLast(v=>!v)}>
+          Show last only
+        </button>
       </div>
 
-      {rows.map(r=>(
-        <div className="card mt16" key={r.id} style={{padding:16}}>
-          <div className="row" style={{justifyContent:"space-between",alignItems:"center"}}>
-            <div style={{fontWeight:700}}>{new Date(r.dateISO).toLocaleDateString()}</div>
-            <button className="btn icon" onClick={()=>{ if(confirm("Delete log?")) deleteHistory(r.id); }}><TrashIcon/></button>
-          </div>
-          <div className="setGrid mt12">
-            {r.sets.map((s,i)=>(
-              <div key={i} className="card" style={{padding:12}}>
-                <div className="label">Set {i+1}</div>
-                <div className="row">
-                  <div className="pill">{s.kg} kg</div>
-                  <div className="pill">{s.reps} reps</div>
+      {filtered.map(log => (
+        <details key={log.id} className="card">
+          <summary className="row space">
+            <div><strong>{new Date(log.dateISO).toLocaleDateString()}</strong> <span className="muted">· {log.dayName}</span></div>
+            <button className="ghost small danger" onClick={(e)=>{e.preventDefault(); deleteLog(log.id);}}>🗑︎</button>
+          </summary>
+          <div className="list">
+            {log.entries.map((en, i) => {
+              const ex = getExerciseById(state, en.exerciseId);
+              return (
+                <div key={i} className="list-row">
+                  <div className="ex-name">{ex?.name || "Exercise"}</div>
+                  <div className="muted">
+                    {en.sets.map((s, idx)=>(
+                      <span key={idx} className="set-pill">{(s.w ?? "—")} {state.units} × {(s.r ?? "—")} reps</span>
+                    ))}
+                  </div>
                 </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
-        </div>
+        </details>
       ))}
 
-      {rows.length===0 && <div className="card mt16" style={{padding:16}}>No history yet.</div>}
+      {filtered.length === 0 && <div className="empty">No history yet.</div>}
     </div>
   );
 }
