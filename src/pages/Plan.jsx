@@ -1,9 +1,8 @@
-import React from "react";
-export default function Plan(){
+export default function Plan() {
   return (
-    <section>
-      <h2 className="h1">Plan</h2>
-      <div className="card"><p>Plan page — baseline ready.</p></div>
-    </section>
+    <div className="page">
+      <h1>Plan</h1>
+      <p>Plan page is wired up. We’ll add days and add-from-Exercises flow.</p>
+    </div>
   );
 }
