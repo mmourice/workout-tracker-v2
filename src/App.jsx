@@ -7,15 +7,22 @@ import History from "./pages/History.jsx";
 import Settings from "./pages/Settings.jsx";
 
 function Home() {
+  const NavTile = ({ to, children }) => (
+    <Link className="tile tile--nav" to={to}>
+      <span>{children}</span>
+    </Link>
+  );
+
   return (
-    <div className="page">
-      <h1>Workout Tracker</h1>
-      <nav className="home-grid">
-        <Link className="pill" to="/session">Session</Link>
-        <Link className="pill" to="/plan">Plan</Link>
-        <Link className="pill" to="/exercises">Exercises</Link>
-        <Link className="pill" to="/history">History</Link>
-        <Link className="pill" to="/settings">Settings</Link>
+    <div className="home hero">
+      <h1 className="hero-title">Workout Tracker</h1>
+
+      <nav className="stack-nav">
+        <NavTile to="/session">Session</NavTile>
+        <NavTile to="/plan">Plan</NavTile>
+        <NavTile to="/exercises">Exercises</NavTile>
+        <NavTile to="/history">History</NavTile>
+        <NavTile to="/settings">Settings</NavTile>
       </nav>
     </div>
   );
