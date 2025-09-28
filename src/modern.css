@@ -505,23 +505,29 @@ a{ color:inherit; text-decoration: none; }
 }
 
 /* Floating timer icon (no frame) */
-.timer-fab {
-  position: absolute;
-  right: 16px;
-  top: 14px;
-  width: 44px;
-  height: 44px;
-  display: grid;
-  place-items: center;
-  border: 1px solid rgba(255,255,255,0.08);
-  border-radius: 50%;
-  background: radial-gradient(120% 120% at 50% 10%, rgba(241,98,2,0.15) 0%, rgba(0,0,0,0.2) 60%);
-  color: var(--brand, #F16202);
-  box-shadow: 0 6px 18px rgba(241,98,2,0.18);
-  cursor: pointer;
-  z-index: 5;              /* <- guarantees it’s clickable */
+/* Minimal, always-clickable stopwatch icon (no circle/glow) */
+.timer-ghost{
+  position:absolute;
+  right:14px;
+  top:14px;
+  width:44px;               /* big tap target but visually just the icon */
+  height:44px;
+  display:grid;
+  place-items:center;
+  border:none;
+  background:transparent;
+  color:var(--brand,#F16202);
+  cursor:pointer;
+  z-index:999;              /* sit above any header overlays */
+  pointer-events:auto;      /* ensure the button receives the tap */
 }
-.timer-fab:active { transform: translateY(1px); }
+.timer-ghost svg{
+  /* tiny soft highlight; remove if you want 100% flat */
+  filter: drop-shadow(0 0 6px rgba(241,98,2,.25));
+}
+.timer-ghost:active{
+  transform: translateY(1px);
+}
 
 /* Set card and remove 'x' */
 .set-card {
