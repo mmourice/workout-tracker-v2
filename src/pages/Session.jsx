@@ -30,27 +30,36 @@ export default function Session() {
 
         <div className="sets-grid">
           {sets.map((s, i) => (
-            <div className="set-card" key={i}>
-              <button className="set-x" onClick={() => removeSet(i)} aria-label={`Remove set ${i + 1}`}>×</button>
-              <div className="set-title">Set {i + 1}</div>
+            {/* --- set card --- */}
+<div className="set-card">
+  <button
+    className="icon-btn danger set-remove"
+    onClick={() => removeSet(idx)}
+    aria-label={`Delete set ${idx + 1}`}
+  >
+    ×
+  </button>
 
-              <div className="set-inputs">
-                <input
-                  inputMode="decimal"
-                  placeholder="kg"
-                  value={s.w}
-                  onChange={(e) => change(i, "w", e.target.value)}
-                  className="num"
-                />
-                <input
-                  inputMode="numeric"
-                  placeholder="reps"
-                  value={s.r}
-                  onChange={(e) => change(i, "r", e.target.value)}
-                  className="num"
-                />
-              </div>
-            </div>
+  <div className="set-title">Set {idx + 1}</div>
+
+  {/* two inputs side-by-side */}
+  <div className="set-fields">
+    <input
+      className="input"
+      inputMode="decimal"
+      placeholder="kg"
+      value={set.weight ?? ""}
+      onChange={(e) => updateSet(idx, { weight: e.target.value })}
+    />
+    <input
+      className="input"
+      inputMode="numeric"
+      placeholder="reps"
+      value={set.reps ?? ""}
+      onChange={(e) => updateSet(idx, { reps: e.target.value })}
+    />
+  </div>
+</div>
           ))}
         </div>
 
