@@ -1,9 +1,8 @@
-import React from "react";
-export default function History(){
+export default function History() {
   return (
-    <section>
-      <h2 className="h1">History</h2>
-      <div className="card"><p>History page — baseline ready.</p></div>
-    </section>
+    <div className="page">
+      <h1>History</h1>
+      <p>History page is wired up. We’ll show past sets and allow delete.</p>
+    </div>
   );
 }
