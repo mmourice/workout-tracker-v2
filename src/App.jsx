@@ -1,51 +1,36 @@
 import React from "react";
 import { Routes, Route, Link } from "react-router-dom";
+import Session from "./pages/Session.jsx";
+import Plan from "./pages/Plan.jsx";
+import Exercises from "./pages/Exercises.jsx";
+import History from "./pages/History.jsx";
+import Settings from "./pages/Settings.jsx";
 
-function Page({ title }) {
+function Home() {
   return (
-    <div style={{ padding: 24, color: "#fff", fontFamily: "system-ui" }}>
-      <h1>{title}</h1>
-      <p>This is a placeholder page. Build succeeded ✅</p>
-      <p><Link to="/">← Back home</Link></p>
+    <div className="page">
+      <h1>Workout Tracker</h1>
+      <nav className="home-grid">
+        <Link className="pill" to="/session">Session</Link>
+        <Link className="pill" to="/plan">Plan</Link>
+        <Link className="pill" to="/exercises">Exercises</Link>
+        <Link className="pill" to="/history">History</Link>
+        <Link className="pill" to="/settings">Settings</Link>
+      </nav>
     </div>
   );
 }
 
 export default function App() {
   return (
-    <div style={{
-      minHeight: "100vh",
-      background: "radial-gradient(1200px 600px at 10% -10%, #1e1729 10%, #000 60%)"
-    }}>
-      <div style={{ padding: 24 }}>
-        <h1 style={{ color: "#fff", marginBottom: 16 }}>Workout Tracker</h1>
-        <nav style={{ display: "grid", gap: 12, gridTemplateColumns: "repeat(2, minmax(0, 180px))" }}>
-          <Link to="/session" style={pill}>Session</Link>
-          <Link to="/plan"    style={pill}>Plan</Link>
-          <Link to="/exercises" style={pill}>Exercises</Link>
-          <Link to="/history" style={pill}>History</Link>
-          <Link to="/settings" style={pill}>Settings</Link>
-        </nav>
-      </div>
-
-      <Routes>
-        <Route path="/" element={<></>} />
-        <Route path="/session" element={<Page title="Session" />} />
-        <Route path="/plan" element={<Page title="Plan" />} />
-        <Route path="/exercises" element={<Page title="Exercises" />} />
-        <Route path="/history" element={<Page title="History" />} />
-        <Route path="/settings" element={<Page title="Settings" />} />
-      </Routes>
-    </div>
+    <Routes>
+      <Route path="/" element={<Home />} />
+      <Route path="/session" element={<Session />} />
+      <Route path="/plan" element={<Plan />} />
+      <Route path="/exercises" element={<Exercises />} />
+      <Route path="/history" element={<History />} />
+      <Route path="/settings" element={<Settings />} />
+      <Route path="*" element={<Home />} />
+    </Routes>
   );
 }
-
-const pill = {
-  padding: "12px 16px",
-  color: "#fff",
-  border: "1px solid rgba(255,255,255,0.15)",
-  borderRadius: 20,
-  textDecoration: "none",
-  textAlign: "center",
-  background: "rgba(255,255,255,0.05)"
-};
