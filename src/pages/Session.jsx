@@ -149,7 +149,9 @@ export default function Session() {
           <h2>Current Exercise</h2>
 
           <div className="toolbar">
-            <div className="chip">{formatMMSS(restSeconds)}</div>
+           <button className="chip" onClick={() => setRestOpen(true)}>
+  {formatMMSS(restSeconds)}
+</button>
             <button className="ghost" onClick={startTimer}>Start</button>
             <button className="ghost" onClick={resetTimer}>Reset</button>
           </div>
