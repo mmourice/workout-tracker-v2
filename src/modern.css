@@ -591,3 +591,39 @@ a{ color:inherit; text-decoration: none; }
 
 .btn-lg { padding: 16px 20px; border-radius: 22px; font-size: 16px; }
 .btn-block { width: 100%; }
+
+/* Header row where the timer sits */
+.current-ex-header{
+  position: relative;
+  display: flex;
+  align-items: center;           /* vertical centering */
+  justify-content: space-between;
+  padding-right: 60px;           /* keep text clear of the icon hit area */
+}
+
+/* Minimal stopwatch button (no circle), larger and centered */
+.timer-ghost{
+  position: absolute;
+  right: 14px;
+  top: 50%;
+  transform: translateY(-50%);   /* align with header vertically */
+  width: 48px;                   /* big tap target */
+  height: 48px;
+  display: grid;
+  place-items: center;
+  border: none;
+  background: transparent;
+  color: var(--brand, #F16202);
+  cursor: pointer;
+  z-index: 1002;                 /* above any overlays */
+  pointer-events: auto;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.timer-ghost svg{
+  width: 26px;
+  height: 26px;
+  filter: drop-shadow(0 0 6px rgba(241,98,2,.25));
+}
+
+.timer-ghost:active{ transform: translateY(calc(-50% + 1px)); }
