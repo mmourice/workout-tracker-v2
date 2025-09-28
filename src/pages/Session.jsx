@@ -140,6 +140,11 @@ export default function Session() {
         </div>
 
         <button className="cta add-set" onClick={addSet}>+ Add set</button>
+        <div className="mt-12" />
+<button className="cta add-set" onClick={addSet}>+ Add set</button>
+
+<div className="mt-8" />
+<button className="btn-primary wide" onClick={saveSession}>Save Session</button>
       </section>
 
       {/* Inline modal (no external file) */}
