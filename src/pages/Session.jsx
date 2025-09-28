@@ -1,67 +1,85 @@
+// src/pages/Session.jsx
 import React, { useState } from "react";
+import { StopwatchIcon } from "../Icons.jsx";
+import RestTimer from "../components/RestTimer.jsx";
 
 export default function Session() {
   const [sets, setSets] = useState([
-    { kg: "", reps: "" },
-    { kg: "", reps: "" },
-    { kg: "", reps: "" },
+    { weight: "", reps: "" },
+    { weight: "", reps: "" },
   ]);
 
-  const addSet = () => setSets((s) => [...s, { kg: "", reps: "" }]);
-  const removeSet = (i) => setSets((s) => s.filter((_, idx) => idx !== i));
-  const update = (i, field, value) =>
-    setSets((s) => s.map((row, idx) => (idx === i ? { ...row, [field]: value } : row)));
+  const [showTimer, setShowTimer] = useState(false);
+
+  const addSet = () => setSets((s) => [...s, { weight: "", reps: "" }]);
+  const removeSet = (idx) =>
+    setSets((s) => s.filter((_, i) => i !== idx));
+
+  const updateSet = (idx, key, value) =>
+    setSets((s) => s.map((set, i) => (i === idx ? { ...set, [key]: value } : set)));
 
   return (
     <div className="page">
       <h1 className="title">Session</h1>
 
-      <section className="card">
-        <div className="row space-between align-center mb-16">
-          <h2 className="h2 m-0">Current Exercise</h2>
-          {/* placeholder timer button (no modal yet) */}
+      <section className="card card-lg">
+        <div className="card-header">
+          <h2 className="card-title">Current Exercise</h2>
+
+          {/* Timer button (shared for this exercise) */}
           <button
             className="icon-btn"
-            onClick={() => alert("Timer coming next")}
             aria-label="Open rest timer"
-            title="Open rest timer"
+            onClick={() => setShowTimer(true)}
           >
-            ⏱
+            <StopwatchIcon />
           </button>
         </div>
 
-        {sets.map((s, i) => (
-          <div className="set-card" key={i}>
-            <div className="row space-between align-center mb-8">
-              <div className="set-title">Set {i + 1}</div>
-              <button className="close-x" onClick={() => removeSet(i)} aria-label={`Remove set ${i + 1}`}>
-                ×
-              </button>
-            </div>
+        {/* 2-per-row grid of set cards */}
+        <div className="setsGrid">
+          {sets.map((set, i) => (
+            <div className="setCard" key={i}>
+              <div className="setHeader">
+                <span className="setTitle">Set {i + 1}</span>
+                <button
+                  className="xBtn"
+                  aria-label={`Remove set ${i + 1}`}
+                  onClick={() => removeSet(i)}
+                >
+                  ×
+                </button>
+              </div>
 
-            <div className="row gap-12">
-              <input
-                className="input"
-                inputMode="decimal"
-                placeholder="kg"
-                value={s.kg}
-                onChange={(e) => update(i, "kg", e.target.value)}
-              />
-              <input
-                className="input"
-                inputMode="numeric"
-                placeholder="reps"
-                value={s.reps}
-                onChange={(e) => update(i, "reps", e.target.value)}
-              />
+              <div className="setInputs">
+                <input
+                  inputMode="decimal"
+                  className="input"
+                  placeholder="kg"
+                  value={set.weight}
+                  onChange={(e) => updateSet(i, "weight", e.target.value)}
+                />
+                <input
+                  inputMode="numeric"
+                  className="input"
+                  placeholder="reps"
+                  value={set.reps}
+                  onChange={(e) => updateSet(i, "reps", e.target.value)}
+                />
+              </div>
             </div>
-          </div>
-        ))}
+          ))}
+        </div>
 
-        <div className="mt-16">
-          <button className="btn-primary wide" onClick={addSet}>+ Add set</button>
+        <div className="card-footer">
+          <button className="cta" onClick={addSet}>+ Add set</button>
         </div>
       </section>
+
+      {/* Timer modal */}
+      {showTimer && (
+        <RestTimer open={showTimer} onClose={() => setShowTimer(false)} />
+      )}
     </div>
   );
 }
