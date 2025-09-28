@@ -10,6 +10,33 @@ export default function Session() {
   const [sets, setSets] = useState([newSet(1), newSet(2), newSet(3)]);
   const [showTimer, setShowTimer] = useState(false);
 
+  // ---- PERSISTENCE: load once on mount ----
+useEffect(() => {
+  try {
+    const raw = localStorage.getItem("session_sets");
+    if (raw) {
+      const parsed = JSON.parse(raw);
+      if (Array.isArray(parsed)) setSets(parsed);
+    }
+  } catch {/* ignore */}
+}, []);
+
+// ---- PERSISTENCE: save whenever sets change ----
+useEffect(() => {
+  try {
+    localStorage.setItem("session_sets", JSON.stringify(sets));
+  } catch {/* ignore */}
+}, [sets]);
+
+// ---- Optional: clear persistence when leaving the page ----
+useEffect(() => {
+  return () => {
+    // keep it if you want continuity; or uncomment next line to clear when navigating away
+    // localStorage.removeItem("session_sets");
+  };
+}, []);
+  
+
   const addSet = () =>
     setSets((s) => [...s, newSet(s.length ? s[s.length - 1].id + 1 : 1)]);
   const removeSet = (id) => setSets((s) => s.filter((x) => x.id !== id));
