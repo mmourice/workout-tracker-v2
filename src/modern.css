@@ -627,3 +627,55 @@ a{ color:inherit; text-decoration: none; }
 }
 
 .timer-ghost:active{ transform: translateY(calc(-50% + 1px)); }
+
+/* Session header stopwatch button */
+.icon-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 42px;
+  height: 42px;
+  border: none;
+  background: transparent;
+  color: var(--accent, #f16202);
+  cursor: pointer;
+  border-radius: 10px;
+}
+.icon-btn svg { width: 22px; height: 22px; }
+.icon-btn:active { transform: translateY(1px); }
+
+/* Set cards */
+.set-card {
+  border-radius: 18px;
+  padding: 14px 14px 16px;
+  background: rgba(255,255,255,0.02);
+  box-shadow: inset 0 0 0 1px rgba(255,255,255,0.06);
+  margin-bottom: 14px;
+}
+.set-title { color: var(--accent, #f16202); font-weight: 700; }
+
+/* Close button (lighter) */
+.close-x {
+  background: none;
+  border: none;
+  color: #c8c8c8;
+  font-size: 20px;
+  line-height: 1;
+  padding: 4px 8px;
+  border-radius: 8px;
+  cursor: pointer;
+}
+.close-x:hover { color: var(--accent, #f16202); }
+
+/* Inputs */
+.row.gap-12 { gap: 12px; }
+.input {
+  flex: 1 1 0px;
+  min-width: 0;
+}
+.btn-primary.wide { width: 100%; }
+
+/* Utility */
+.mb-8 { margin-bottom: 8px; }
+.mb-16 { margin-bottom: 16px; }
+.mt-16 { margin-top: 16px; }
