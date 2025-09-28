@@ -2,26 +2,15 @@
 import React, { useState } from "react";
 import RestTimer from "../components/RestTimer.jsx";
 
-/**
- * Simple local state version of the Session page.
- * - Two-column inputs (kg / reps)
- * - Minimal "open timer" icon button in the header
- * - Add / remove sets
- * - No external store required
- */
-
 export default function Session() {
-  // sets = [{ weight: "", reps: "" }, ...]
   const [sets, setSets] = useState([
     { weight: "", reps: "" },
     { weight: "", reps: "" },
   ]);
-
   const [timerOpen, setTimerOpen] = useState(false);
 
   const addSet = () => setSets((s) => [...s, { weight: "", reps: "" }]);
-  const removeSet = (idx) =>
-    setSets((s) => s.filter((_, i) => i !== idx));
+  const removeSet = (idx) => setSets((s) => s.filter((_, i) => i !== idx));
   const updateSet = (idx, patch) =>
     setSets((s) => s.map((set, i) => (i === idx ? { ...set, ...patch } : set)));
 
@@ -29,43 +18,38 @@ export default function Session() {
     <div className="page">
       <h1 className="page-title">Session</h1>
 
-      {/* Current Exercise card */}
-      <section className="card">
-        <header className="card-header" style={{ display: "flex", alignItems: "center" }}>
+      <section className="card session-card">
+        <header className="card-header timer-header">
           <h2 className="card-title">Current Exercise</h2>
 
-          {/* icon-only button to open the timer */}
-          <div className="tools">
-            <button
-              className="icon-btn brand"
-              onClick={() => setTimerOpen(true)}
-              aria-label="Open rest timer"
-              title="Rest timer"
+          {/* absolutely-positioned timer icon to guarantee clicks */}
+          <button
+            className="timer-fab"
+            aria-label="Open rest timer"
+            title="Rest timer"
+            onClick={() => setTimerOpen(true)}
+          >
+            <svg
+              viewBox="0 0 24 24"
+              width="20"
+              height="20"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
             >
-              {/* stopwatch icon (inline SVG; no extra import) */}
-              <svg
-                viewBox="0 0 24 24"
-                width="22"
-                height="22"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              >
-                <path d="M9 2h6" />
-                <path d="M12 2v2" />
-                <circle cx="12" cy="14" r="8" />
-                <path d="M12 14l3-3" />
-              </svg>
-            </button>
-          </div>
+              <path d="M9 2h6" />
+              <path d="M12 2v2" />
+              <circle cx="12" cy="14" r="8" />
+              <path d="M12 14l3-3" />
+            </svg>
+          </button>
         </header>
 
         <div className="card-body" style={{ display: "grid", gap: 16 }}>
           {sets.map((set, idx) => (
             <div key={idx} className="set-card">
-              {/* remove X (no circular background) */}
               <button
                 className="icon-btn danger set-remove"
                 onClick={() => removeSet(idx)}
@@ -96,18 +80,19 @@ export default function Session() {
             </div>
           ))}
 
-          <div>
-            <button className="btn-primary" onClick={addSet}>+ Add set</button>
+          {/* footer with a nicer, full-width pill button */}
+          <div className="set-footer">
+            <button className="btn-primary btn-lg btn-block" onClick={addSet}>
+              + Add set
+            </button>
           </div>
         </div>
       </section>
 
-      {/* Rest timer modal */}
       {timerOpen && (
         <RestTimer
           initialSeconds={90}
           onClose={() => setTimerOpen(false)}
-          // optional callbacks
           onDone={() => setTimerOpen(false)}
         />
       )}
