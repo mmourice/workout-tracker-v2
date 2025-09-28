@@ -407,3 +407,90 @@ a{ color:inherit; text-decoration: none; }
 .timer-value{ position:absolute; inset:0; display:grid; place-items:center; font-size:38px; font-weight:900; }
 .timer-controls{ display:flex; align-items:center; justify-content:space-between; gap:12px; margin-top:14px; }
 .primary.round{ border-radius:999px; padding:12px 28px; font-weight:800; }
+
+/* ---------- Session tidy-ups ---------- */
+
+/* Icon-only buttons (no frame) */
+.icon-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 8px;
+  border: none;
+  background: transparent;
+  color: var(--brand-500, #F16202);
+  border-radius: 10px;
+}
+.icon-btn.brand { color: var(--brand-500, #F16202); }
+.icon-btn.danger { color: var(--danger-400, #ff6b6b); }
+.icon-btn:active { transform: translateY(1px); }
+
+/* Set cards */
+.set-card {
+  position: relative;
+  border-radius: 18px;
+  background: rgba(255,255,255,0.02);
+  border: 1px solid rgba(255,255,255,0.06);
+  padding: 14px 14px 16px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.35) inset,
+              0 6px 20px rgba(0,0,0,0.25);
+}
+.set-title {
+  color: var(--brand-500, #F16202);
+  font-weight: 700;
+  margin-bottom: 10px;
+}
+
+/* Two inputs side-by-side, clean responsive widths */
+.set-fields {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(120px, 1fr));
+  gap: 12px;
+}
+
+/* Inputs: full width, softer look */
+.set-fields .input {
+  width: 100%;
+  border-radius: 16px;
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.08);
+  padding: 14px 16px;
+  color: #fff;
+}
+
+/* Remove the circular badge around the “x” */
+.set-remove {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  width: auto; height: auto;
+  line-height: 1;
+  font-size: 18px;
+}
+.set-remove:hover { opacity: 0.85; }
+
+/* Header tools container (so the icon sits nicely on the right) */
+.tools {
+  margin-left: auto;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* Rest timer modal accents (add orange + clearer controls) */
+.timer-modal .btn-ghost {
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,255,255,0.12);
+}
+.timer-modal .btn-primary {
+  background: var(--brand-500, #F16202);
+  color: #111;
+  font-weight: 700;
+}
+.timer-modal .time-ring {
+  --ring: var(--brand-500, #F16202);
+}
