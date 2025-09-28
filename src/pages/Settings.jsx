@@ -1,9 +1,8 @@
-import React from "react";
-export default function Settings(){
+export default function Settings() {
   return (
-    <section>
-      <h2 className="h1">Settings</h2>
-      <div className="card"><p>Settings page — baseline ready.</p></div>
-    </section>
+    <div className="page">
+      <h1>Settings</h1>
+      <p>Settings page is wired up. Units toggle (kg/lb) soon.</p>
+    </div>
   );
 }
