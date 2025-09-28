@@ -1,44 +1,85 @@
-import React, { useState } from "react";
-import RestTimer from "../components/RestTimer.jsx";
-import { StopwatchIcon } from "../Icons.jsx";
+// src/pages/Session.jsx
+import React, { useEffect, useRef, useState } from "react";
 
-function newSet(id) {
-  return { id, kg: "", reps: "" };
+/* ---------- Inline Minimal Rest Timer (no external import) ---------- */
+function RestTimerInline({ open, onClose, startSeconds = 90 }) {
+  const [secs, setSecs] = useState(startSeconds);
+  const [running, setRunning] = useState(true);
+  const raf = useRef(null);
+  const last = useRef(null);
+
+  useEffect(() => {
+    if (!open) return;
+    setSecs(startSeconds);
+    setRunning(true);
+  }, [open, startSeconds]);
+
+  useEffect(() => {
+    if (!open || !running) return;
+    const tick = (t) => {
+      if (!last.current) last.current = t;
+      const dt = (t - last.current) / 1000;
+      last.current = t;
+      setSecs((s) => Math.max(0, s - dt));
+      raf.current = requestAnimationFrame(tick);
+    };
+    raf.current = requestAnimationFrame(tick);
+    return () => raf.current && cancelAnimationFrame(raf.current);
+  }, [open, running]);
+
+  if (!open) return null;
+
+  const mm = String(Math.floor(secs / 60)).padStart(2, "0");
+  const ss = String(Math.floor(secs % 60)).padStart(2, "0");
+
+  return (
+    <div className="modal-overlay" onClick={onClose}>
+      <div className="modal" onClick={(e) => e.stopPropagation()}>
+        <div className="modal-head">
+          <h3>Rest Time</h3>
+          <button className="icon-x" onClick={onClose} aria-label="Close">×</button>
+        </div>
+
+        <div className="timer-face">
+          <div className="timer-circle" />
+          <div className="timer-value">{mm}:{ss}</div>
+        </div>
+
+        <div className="timer-actions">
+          <button onClick={() => setSecs((s) => Math.max(0, s - 30))}>−30</button>
+          <button className="pause" onClick={() => setRunning((r) => !r)}>
+            {running ? "Pause" : "Resume"}
+          </button>
+          <button onClick={() => setSecs((s) => s + 30)}>+30</button>
+        </div>
+      </div>
+    </div>
+  );
 }
 
+/* ---------- Session Page (single column UI you liked) ---------- */
+function makeSet(id) { return { id, kg: "", reps: "" }; }
+
 export default function Session() {
-  const [sets, setSets] = useState([newSet(1), newSet(2), newSet(3)]);
+  const [sets, setSets] = useState([makeSet(1), makeSet(2), makeSet(3)]);
   const [showTimer, setShowTimer] = useState(false);
 
-  // ---- PERSISTENCE: load once on mount ----
-useEffect(() => {
-  try {
-    const raw = localStorage.getItem("session_sets");
-    if (raw) {
-      const parsed = JSON.parse(raw);
-      if (Array.isArray(parsed)) setSets(parsed);
-    }
-  } catch {/* ignore */}
-}, []);
-
-// ---- PERSISTENCE: save whenever sets change ----
-useEffect(() => {
-  try {
-    localStorage.setItem("session_sets", JSON.stringify(sets));
-  } catch {/* ignore */}
-}, [sets]);
-
-// ---- Optional: clear persistence when leaving the page ----
-useEffect(() => {
-  return () => {
-    // keep it if you want continuity; or uncomment next line to clear when navigating away
-    // localStorage.removeItem("session_sets");
-  };
-}, []);
-  
+  // Optional: persist sets so refresh doesn’t wipe
+  useEffect(() => {
+    try {
+      const raw = localStorage.getItem("session_sets");
+      if (raw) {
+        const parsed = JSON.parse(raw);
+        if (Array.isArray(parsed)) setSets(parsed);
+      }
+    } catch {}
+  }, []);
+  useEffect(() => {
+    try { localStorage.setItem("session_sets", JSON.stringify(sets)); } catch {}
+  }, [sets]);
 
   const addSet = () =>
-    setSets((s) => [...s, newSet(s.length ? s[s.length - 1].id + 1 : 1)]);
+    setSets((s) => [...s, makeSet(s.length ? s[s.length - 1].id + 1 : 1)]);
   const removeSet = (id) => setSets((s) => s.filter((x) => x.id !== id));
   const updateSet = (id, field, value) =>
     setSets((s) => s.map((x) => (x.id === id ? { ...x, [field]: value } : x)));
@@ -47,32 +88,35 @@ useEffect(() => {
     <div className="page">
       <h1 className="title">Session</h1>
 
-      <section className="card session-card">
-        <div className="card-head">
-          <h2 className="card-title">Current Exercise</h2>
+      <section className="card session-card" style={{ position: "relative" }}>
+        {/* Header */}
+        <div className="card-head" style={{ display:"flex", alignItems:"center", justifyContent:"space-between", marginBottom:12 }}>
+          <h2 className="card-title" style={{ margin:0 }}>Current Exercise</h2>
 
-          {/* Timer button (top-right) */}
+          {/* Stopwatch as a plain button; big hit area */}
           <button
             className="timer-btn"
             aria-label="Open rest timer"
             onClick={() => setShowTimer(true)}
+            title="Rest timer"
           >
-            <StopwatchIcon />
+            {/* inline icon (no external import) */}
+            <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M9 2h6" />
+              <path d="M12 2v2" />
+              <circle cx="12" cy="14" r="8" />
+              <path d="M12 14l3-3" />
+            </svg>
           </button>
         </div>
 
+        {/* Sets (single column) */}
         <div className="sets-col">
           {sets.map((s) => (
             <div key={s.id} className="set-card">
               <div className="set-head">
                 <span className="set-title">Set {s.id}</span>
-                <button
-                  className="icon-x"
-                  aria-label={`Remove set ${s.id}`}
-                  onClick={() => removeSet(s.id)}
-                >
-                  ×
-                </button>
+                <button className="icon-x" aria-label={`Remove set ${s.id}`} onClick={() => removeSet(s.id)}>×</button>
               </div>
 
               <div className="fields">
@@ -95,12 +139,11 @@ useEffect(() => {
           ))}
         </div>
 
-        <button className="cta add-set" onClick={addSet}>
-          + Add set
-        </button>
+        <button className="cta add-set" onClick={addSet}>+ Add set</button>
       </section>
 
-      {showTimer && <RestTimer onClose={() => setShowTimer(false)} />}
+      {/* Inline modal (no external file) */}
+      <RestTimerInline open={showTimer} onClose={() => setShowTimer(false)} startSeconds={90} />
     </div>
   );
 }
