@@ -1,127 +1,117 @@
-import React, { useMemo, useState, useEffect, useRef } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 
-/**
- * Very small local storage helper
- */
-const LS_KEY = "wt_session_sets_v1";
-const loadSets = () => {
-  try {
-    const raw = localStorage.getItem(LS_KEY);
-    return raw ? JSON.parse(raw) : null;
-  } catch {
-    return null;
-  }
-};
-const saveSets = (sets) => {
-  try {
-    localStorage.setItem(LS_KEY, JSON.stringify(sets));
-  } catch {}
-};
-
-/**
- * Rest Timer (per session for now)
- */
-function RestTimer({ defaultSeconds = 90 }) {
-  const [seconds, setSeconds] = useState(defaultSeconds);
+/** Simple hh:mm (or mm:ss) display for a seconds counter */
+function useCountdown(initial = 90) {
+  const [secs, setSecs] = useState(initial);
   const [running, setRunning] = useState(false);
   const tickRef = useRef(null);
 
   useEffect(() => {
-    if (running) {
-      tickRef.current = setInterval(() => {
-        setSeconds((s) => (s > 0 ? s - 1 : 0));
-      }, 1000);
-    }
+    if (!running) return;
+    tickRef.current = setInterval(() => {
+      setSecs((s) => (s > 0 ? s - 1 : 0));
+    }, 1000);
     return () => clearInterval(tickRef.current);
   }, [running]);
 
-  const mm = String(Math.floor(seconds / 60)).padStart(2, "0");
-  const ss = String(seconds % 60).padStart(2, "0");
+  const start = () => setRunning(true);
+  const pause = () => setRunning(false);
+  const reset = () => {
+    setRunning(false);
+    setSecs(initial);
+  };
 
+  const label = useMemo(() => {
+    const m = String(Math.floor(secs / 60)).padStart(2, "0");
+    const s = String(secs % 60).padStart(2, "0");
+    return `${m}:${s}`;
+  }, [secs]);
+
+  return { label, start, pause, reset, running, secs };
+}
+
+function InputPill({ placeholder, value, onChange, inputMode = "decimal" }) {
+  const [showPlaceholder, setShowPlaceholder] = useState(true);
   return (
-    <div className="timer">
-      <div className="timer-time">{mm}:{ss}</div>
-      <div className="timer-actions">
-        <button className="btn" onClick={() => setRunning((v) => !v)}>
-          {running ? "Pause" : "Start"}
-        </button>
-        <button
-          className="btn"
-          onClick={() => {
-            setRunning(false);
-            setSeconds(defaultSeconds);
-          }}
-        >
-          Reset
-        </button>
-      </div>
+    <div className="pill-input">
+      <input
+        inputMode={inputMode}
+        type="text"
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        onFocus={() => setShowPlaceholder(false)}
+        onBlur={(e) => setShowPlaceholder(e.target.value.trim() === "")}
+      />
+      {showPlaceholder && <span className="pill-placeholder">{placeholder}</span>}
     </div>
   );
 }
 
 export default function Session() {
-  // initial sets: try load from LS, otherwise 2 empty sets
-  const initial = useMemo(() => loadSets() ?? [
+  const timer = useCountdown(90);
+
+  const [sets, setSets] = useState([
     { weight: "", reps: "" },
     { weight: "", reps: "" },
-  ], []);
-  const [sets, setSets] = useState(initial);
+  ]);
 
-  useEffect(() => saveSets(sets), [sets]);
+  const addSet = () => setSets((arr) => [...arr, { weight: "", reps: "" }]);
+  const removeSet = (i) =>
+    setSets((arr) => (arr.length > 1 ? arr.filter((_, idx) => idx !== i) : arr));
 
-  const addSet = () =>
-    setSets((s) => [...s, { weight: "", reps: "" }]);
-
-  const removeSet = (idx) =>
-    setSets((s) => s.filter((_, i) => i !== idx));
-
-  const update = (idx, field, value) =>
-    setSets((s) =>
-      s.map((row, i) => (i === idx ? { ...row, [field]: value } : row))
-    );
+  const update = (i, key, val) =>
+    setSets((arr) => arr.map((s, idx) => (idx === i ? { ...s, [key]: val } : s)));
 
   return (
     <div className="page">
-      <h1>Session</h1>
+      <h1 className="page-title">Session</h1>
 
-      {/* Session card */}
-      <div className="card">
-        <div className="card-head">
-          <div className="card-title">Current Exercise</div>
-          <div className="card-actions">
-            <RestTimer defaultSeconds={90} />
-            <button className="btn primary" onClick={addSet}>+ Add set</button>
+      <section className="card session-card">
+        <header className="card-head">
+          <h2 className="card-title">Current Exercise</h2>
+
+          <div className="timer-row">
+            <div className="timer-pill">{timer.label}</div>
+            {timer.running ? (
+              <button className="btn btn-ghost" onClick={timer.pause}>Pause</button>
+            ) : (
+              <button className="btn btn-ghost" onClick={timer.start}>Start</button>
+            )}
+            <button className="btn btn-ghost" onClick={timer.reset}>Reset</button>
           </div>
-        </div>
+
+          <div className="card-actions">
+            <button className="btn btn-primary" onClick={addSet}>+ Add set</button>
+          </div>
+        </header>
 
         <div className="sets-grid">
-          {sets.map((row, i) => (
-            <div className="set" key={i}>
+          {sets.map((s, i) => (
+            <div className="set-card" key={i}>
               <div className="set-head">
                 <div className="set-title">Set {i + 1}</div>
-                <button className="chip danger" onClick={() => removeSet(i)}>×</button>
+                <button className="chip chip-danger" onClick={() => removeSet(i)} aria-label={`Remove set ${i+1}`}>
+                  ×
+                </button>
               </div>
 
-              <div className="set-fields">
-                <input
-                  className="field"
-                  inputMode="decimal"
+              <div className="set-row">
+                <InputPill
                   placeholder="kg"
-                  value={row.weight}
-                  onChange={(e) => update(i, "weight", e.target.value)}
+                  value={s.weight}
+                  onChange={(v) => update(i, "weight", v)}
                 />
-                <input
-                  className="field"
-                  inputMode="numeric"
+                <InputPill
                   placeholder="reps"
-                  value={row.reps}
-                  onChange={(e) => update(i, "reps", e.target.value)}
+                  value={s.reps}
+                  onChange={(v) => update(i, "reps", v)}
+                  inputMode="numeric"
                 />
               </div>
             </div>
           ))}
         </div>
-      </div>
+      </section>
     </div>
   );
 }
