@@ -1,34 +1,32 @@
-// src/pages/Session.jsx
 import React, { useState } from "react";
-import { StopwatchIcon } from "../Icons.jsx";
 import RestTimer from "../components/RestTimer.jsx";
+import { StopwatchIcon } from "../Icons.jsx";
+
+function newSet(id) {
+  return { id, kg: "", reps: "" };
+}
 
 export default function Session() {
-  const [sets, setSets] = useState([
-    { weight: "", reps: "" },
-    { weight: "", reps: "" },
-  ]);
-
+  const [sets, setSets] = useState([newSet(1), newSet(2), newSet(3)]);
   const [showTimer, setShowTimer] = useState(false);
 
-  const addSet = () => setSets((s) => [...s, { weight: "", reps: "" }]);
-  const removeSet = (idx) =>
-    setSets((s) => s.filter((_, i) => i !== idx));
-
-  const updateSet = (idx, key, value) =>
-    setSets((s) => s.map((set, i) => (i === idx ? { ...set, [key]: value } : set)));
+  const addSet = () =>
+    setSets((s) => [...s, newSet(s.length ? s[s.length - 1].id + 1 : 1)]);
+  const removeSet = (id) => setSets((s) => s.filter((x) => x.id !== id));
+  const updateSet = (id, field, value) =>
+    setSets((s) => s.map((x) => (x.id === id ? { ...x, [field]: value } : x)));
 
   return (
     <div className="page">
       <h1 className="title">Session</h1>
 
-      <section className="card card-lg">
-        <div className="card-header">
+      <section className="card session-card">
+        <div className="card-head">
           <h2 className="card-title">Current Exercise</h2>
 
-          {/* Timer button (shared for this exercise) */}
+          {/* Timer button (top-right) */}
           <button
-            className="icon-btn"
+            className="timer-btn"
             aria-label="Open rest timer"
             onClick={() => setShowTimer(true)}
           >
@@ -36,50 +34,46 @@ export default function Session() {
           </button>
         </div>
 
-        {/* 2-per-row grid of set cards */}
-        <div className="setsGrid">
-          {sets.map((set, i) => (
-            <div className="setCard" key={i}>
-              <div className="setHeader">
-                <span className="setTitle">Set {i + 1}</span>
+        <div className="sets-col">
+          {sets.map((s) => (
+            <div key={s.id} className="set-card">
+              <div className="set-head">
+                <span className="set-title">Set {s.id}</span>
                 <button
-                  className="xBtn"
-                  aria-label={`Remove set ${i + 1}`}
-                  onClick={() => removeSet(i)}
+                  className="icon-x"
+                  aria-label={`Remove set ${s.id}`}
+                  onClick={() => removeSet(s.id)}
                 >
                   ×
                 </button>
               </div>
 
-              <div className="setInputs">
+              <div className="fields">
                 <input
-                  inputMode="decimal"
                   className="input"
+                  inputMode="decimal"
                   placeholder="kg"
-                  value={set.weight}
-                  onChange={(e) => updateSet(i, "weight", e.target.value)}
+                  value={s.kg}
+                  onChange={(e) => updateSet(s.id, "kg", e.target.value)}
                 />
                 <input
-                  inputMode="numeric"
                   className="input"
+                  inputMode="numeric"
                   placeholder="reps"
-                  value={set.reps}
-                  onChange={(e) => updateSet(i, "reps", e.target.value)}
+                  value={s.reps}
+                  onChange={(e) => updateSet(s.id, "reps", e.target.value)}
                 />
               </div>
             </div>
           ))}
         </div>
 
-        <div className="card-footer">
-          <button className="cta" onClick={addSet}>+ Add set</button>
-        </div>
+        <button className="cta add-set" onClick={addSet}>
+          + Add set
+        </button>
       </section>
 
-      {/* Timer modal */}
-      {showTimer && (
-        <RestTimer open={showTimer} onClose={() => setShowTimer(false)} />
-      )}
+      {showTimer && <RestTimer onClose={() => setShowTimer(false)} />}
     </div>
   );
 }
