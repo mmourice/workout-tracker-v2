@@ -162,7 +162,9 @@ export default function Session() {
         <button className="cta add-set" onClick={}>+ Add set</button>
 
 <div className="mt-8" />
-<button className="btn-primary wide" onClick={saveSession}>Save Session</button>
+<button className="btn-primary wide" onClick={saveSession}>
+  Save Session
+</button>
       </section>
 
       {/* Inline modal (no external file) */}
