@@ -24,7 +24,7 @@ export default function Session() {
 
           {/* absolutely-positioned timer icon to guarantee clicks */}
           <button
-            className="timer-fab"
+            className="timer-ghost"
             aria-label="Open rest timer"
             title="Rest timer"
             onClick={() => setTimerOpen(true)}
