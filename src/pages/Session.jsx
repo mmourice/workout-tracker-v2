@@ -78,11 +78,31 @@ export default function Session() {
     try { localStorage.setItem("session_sets", JSON.stringify(sets)); } catch {}
   }, [sets]);
 
-  const addSet = () =>
+  const  = () =>
     setSets((s) => [...s, makeSet(s.length ? s[s.length - 1].id + 1 : 1)]);
   const removeSet = (id) => setSets((s) => s.filter((x) => x.id !== id));
   const updateSet = (id, field, value) =>
     setSets((s) => s.map((x) => (x.id === id ? { ...x, [field]: value } : x)));
+
+  const saveSession = () => {
+  const entry = {
+    id: crypto.randomUUID ? crypto.randomUUID() : String(Date.now()),
+    dateISO: new Date().toISOString(),
+    exerciseName: "Current Exercise", // later: replace with actual selected exercise
+    sets: sets.map(s => ({ kg: s.kg || "0", reps: s.reps || "0" })),
+  };
+
+  try {
+    const raw = localStorage.getItem("wt_logs");
+    const arr = raw ? JSON.parse(raw) : [];
+    arr.push(entry);
+    localStorage.setItem("wt_logs", JSON.stringify(arr));
+    alert("Session saved ✔"); // later: replace with toast
+  } catch (e) {
+    alert("Could not save session.");
+    console.error(e);
+  }
+};
 
   return (
     <div className="page">
@@ -139,7 +159,7 @@ export default function Session() {
           ))}
         </div>
 
-        <button className="cta add-set" onClick={addSet}>+ Add set</button>
+        <button className="cta add-set" onClick={}>+ Add set</button>
 
 <div className="mt-8" />
 <button className="btn-primary wide" onClick={saveSession}>Save Session</button>
