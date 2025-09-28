@@ -8,7 +8,7 @@ function formatMMSS(total) {
   return `${String(m).padStart(2, "0")}:${String(s).padStart(2, "0")}`;
 }
 
-export default function RestTimer({ open, onClose, defaultSeconds = 90 }) {
+export default function RestTimer({ initialSeconds = 90, onClose, accent = "#F16202" }) {
   const [seconds, setSeconds] = useState(defaultSeconds);
   const [running, setRunning] = useState(true);
   const raf = useRef(null);
