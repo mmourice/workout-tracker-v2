@@ -1,9 +1,8 @@
-import React from "react";
-export default function Exercises(){
+export default function Exercises() {
   return (
-    <section>
-      <h2 className="h1">Exercises</h2>
-      <div className="card"><p>Exercises page — baseline ready.</p></div>
-    </section>
+    <div className="page">
+      <h1>Exercises</h1>
+      <p>Exercises page is wired up. Categories & modal come next.</p>
+    </div>
   );
 }
