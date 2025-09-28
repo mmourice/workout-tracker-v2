@@ -4,6 +4,6 @@ import react from "@vitejs/plugin-react";
 
 export default defineConfig({
   plugins: [react()],
-  // IMPORTANT: set to your repo name, including trailing slash
+  // IMPORTANT: your repo name
   base: "/workout-tracker-v2/",
 });
