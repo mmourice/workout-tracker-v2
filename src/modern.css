@@ -679,3 +679,72 @@ a{ color:inherit; text-decoration: none; }
 .mb-8 { margin-bottom: 8px; }
 .mb-16 { margin-bottom: 16px; }
 .mt-16 { margin-top: 16px; }
+
+/* 2-per-row grid for set cards */
+.setsGrid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+}
+
+/* On very small screens, still keep 2 per row — if you ever want 1 per row, change 2 -> 1 inside this media query */
+@media (max-width: 360px) {
+  .setsGrid { grid-template-columns: 1fr; }
+}
+
+/* Set card look */
+.setCard {
+  background: rgba(255,255,255,0.02);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 16px;
+  padding: 14px;
+  box-shadow: 0 1px 0 rgba(255,255,255,0.04) inset, 0 12px 40px rgba(0,0,0,0.35);
+}
+
+.setHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+
+.setTitle {
+  color: #F16202;
+  font-weight: 800;
+  letter-spacing: 0.2px;
+}
+
+.xBtn {
+  width: 28px;
+  height: 28px;
+  border-radius: 8px;
+  background: transparent;
+  border: 1px solid rgba(255,255,255,0.14);
+  color: #ff8470;
+  display: grid;
+  place-items: center;
+  line-height: 1;
+}
+
+.setInputs {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+/* Timer icon button (no frame, clean) */
+.icon-btn {
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  border: none;
+  background: transparent;
+  color: #F16202;
+  padding: 0;
+}
+
+/* Large add button full width */
+.card-footer .cta {
+  width: 100%;
+}
