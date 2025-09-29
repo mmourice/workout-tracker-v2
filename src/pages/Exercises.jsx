@@ -147,50 +147,56 @@ export default function Exercises() {
       </div>
 
       {/* Add Exercise Modal */}
-      <Modal open={adding} onClose={() => setAdding(false)}>
-        <form onSubmit={addExercise} className="add-form">
-          <h3 className="modal-title">Add Exercise</h3>
-          <label className="field">
-            <span>Name</span>
-            <input
-              className="input"
-              value={form.name}
-              onChange={(e) => setForm({ ...form, name: e.target.value })}
-              placeholder="e.g., Incline Dumbbell Press"
-              required
-            />
-          </label>
-          <label className="field">
-            <span>Group</span>
-            <select
-              className="input"
-              value={form.group}
-              onChange={(e) => setForm({ ...form, group: e.target.value })}
-            >
-              {GROUPS.map((g) => (
-                <option key={g} value={g}>{g}</option>
-              ))}
-            </select>
-          </label>
-          <label className="field">
-            <span>Link (YouTube, optional)</span>
-            <input
-              className="input"
-              value={form.link}
-              onChange={(e) => setForm({ ...form, link: e.target.value })}
-              placeholder="https://…"
-              inputMode="url"
-            />
-          </label>
+   <div className="modal">
+  <div className="sheet-card">
+    <h3 className="sheet-title">Add Exercise</h3>
+    <form onSubmit={handleAddExercise}>
+      <div className="form-card">
+        <div className="form-row">
+          <label className="label">Name</label>
+          <input
+            className="input"
+            placeholder="e.g., Incline Dumbbell Press"
+            value={newName}
+            onChange={(e) => setNewName(e.target.value)}
+          />
+        </div>
 
-          <div className="modal-actions">
-            <button type="button" className="btn" onClick={() => setAdding(false)}>
-              Cancel
-            </button>
-            <button type="submit" className="btn primary">Add</button>
-          </div>
-        </form>
-      </Modal>
-    </div>
+        <div className="form-row">
+          <label className="label">Group</label>
+          <select
+            className="select"
+            value={newGroup}
+            onChange={(e) => setNewGroup(e.target.value)}
+          >
+            <option value="Chest">Chest</option>
+            <option value="Back">Back</option>
+            <option value="Shoulders">Shoulders</option>
+            <option value="Legs">Legs</option>
+            <option value="Arms">Arms</option>
+            <option value="Core">Core</option>
+            <option value="Cardio">Cardio</option>
+            <option value="Other">Other</option>
+          </select>
+        </div>
+
+        <div className="form-row">
+          <label className="label">Link (YouTube, optional)</label>
+          <input
+            className="input"
+            placeholder="https://…"
+            value={newLink}
+            onChange={(e) => setNewLink(e.target.value)}
+          />
+        </div>
+      </div>
+
+      <div className="sheet-actions">
+        <button type="button" className="btn ghost" onClick={() => setShowAdd(false)}>Cancel</button>
+        <button type="submit" className="btn primary wide">Add</button>
+      </div>
+    </form>
+  </div>
+</div>
   );
 }
