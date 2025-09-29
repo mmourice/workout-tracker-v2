@@ -908,7 +908,7 @@ a{ color:inherit; text-decoration: none; }
   color: var(--accent);
 }
 .chips {
-  display: flex; flex-wrap: wrap; gap: 10px;
+  display: flex; flex-wrap: wrap; gap: 8px;
 }
 .chip-tag {
   display: inline-flex;
@@ -981,20 +981,27 @@ a{ color:inherit; text-decoration: none; }
 .chip-tag {
   display: inline-flex;
   align-items: center;
-  gap: 8px;
+  justify-content: center;
+  gap: 6px;
 
   padding: 8px 14px;
+  margin: 4px;
   border-radius: 9999px;
 
   background: rgba(255,255,255,0.06);
   border: 1px solid rgba(255,255,255,0.08);
 
-  flex: 0 1 auto;          /* don't grow too big, don't shrink to circles */
-  max-width: 100%;
-  white-space: normal;     /* allow multi-line */
-  overflow-wrap: anywhere; /* wrap long words anywhere if needed */
-  word-break: break-word;
+  font-size: 14px;
   line-height: 1.3;
+  color: #fff;
+
+  flex: 0 1 auto;          /* ✅ no shrinking to circles */
+  width: auto !important;  /* ✅ force width to auto */
+  height: auto !important; /* ✅ allow tall chips if text wraps */
+
+  white-space: normal;     /* ✅ text can wrap */
+  word-break: break-word;  /* ✅ break long words */
+  overflow: visible;       /* ✅ don’t clip text */
 }
 
 /* the little “x” button on a chip */
