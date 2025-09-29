@@ -848,3 +848,14 @@ a{ color:inherit; text-decoration: none; }
 @media (min-width: 560px) {
   .timer-btn { top: 10px; right: 20px; }
 }
+
+/* --- Session sets input row --- */
+.inputs-row {
+  display: flex;
+  gap: 12px;        /* space between kg and reps */
+  margin-top: 8px;
+}
+
+.inputs-row .input {
+  flex: 1;          /* make both inputs equal width */
+}
