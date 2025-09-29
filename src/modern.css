@@ -1148,3 +1148,63 @@ a{ color:inherit; text-decoration: none; }
   .sheet-actions { grid-template-columns: 140px 1fr; }
   .btn.wide { grid-column: auto; }
 }
+
+/* ===== Bottom-sheet modal (fixed to viewport) ===== */
+.sheet-backdrop{
+  position: fixed;             /* <-- key: pin to viewport */
+  inset: 0;
+  z-index: 1000;
+  background: rgba(0,0,0,.55);
+  backdrop-filter: blur(2px);
+  display: flex;
+  align-items: flex-end;       /* slide up from bottom */
+  justify-content: center;
+}
+
+.sheet-card{
+  width: 100%;
+  max-width: 720px;
+  background: #121214;
+  border: 1px solid #2a2a2f;
+  border-top-left-radius: 20px;
+  border-top-right-radius: 20px;
+  box-shadow: 0 -20px 60px rgba(0,0,0,.5);
+  padding: 20px 16px 16px;
+  transform: translateY(8px);
+  animation: sheetIn .18s ease-out forwards;
+  max-height: 82vh;            /* scroll inside if tall */
+  overflow: auto;
+}
+
+@keyframes sheetIn{
+  from{ transform: translateY(24px); opacity: .9; }
+  to  { transform: translateY(0);    opacity: 1;  }
+}
+
+/* unified form card inside the sheet */
+.form-card{
+  background: #0e0f12;
+  border: 1px solid #22232a;
+  border-radius: 16px;
+  padding: 14px;
+}
+
+.form-row + .form-row{ margin-top: 12px; }
+
+.sheet-title{
+  font-size: 20px;
+  font-weight: 700;
+  margin: 0 0 12px 2px;
+}
+
+.sheet-actions{
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-top: 14px;
+}
+.btn.ghost{
+  background: #1a1b20;
+  border: 1px solid #2a2b31;
+}
+.btn.primary.wide{ width: 100%; }
