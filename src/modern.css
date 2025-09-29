@@ -1033,3 +1033,118 @@ a{ color:inherit; text-decoration: none; }
 .chip .close:hover {
   color: #ff7a26;            /* lighter orange on hover */
 }
+
+/* --- Full-width bottom sheet modal --- */
+.sheet {
+  position: fixed; inset: 0;
+  background: rgba(0,0,0,.55);
+  backdrop-filter: blur(2px);
+  display: grid;
+  align-items: end;
+  z-index: 1000;
+  padding: 16px;
+}
+
+.sheet-card {
+  background: rgba(18,18,18,.96);
+  border: 1px solid rgba(255,255,255,.06);
+  border-radius: 18px 18px 0 0;
+  box-shadow: 0 20px 60px rgba(0,0,0,.5);
+  padding: 18px 16px 14px;
+  max-width: 680px;
+  width: 100%;
+  margin: 0 auto;
+}
+
+@media (min-width: 640px) {
+  .sheet { align-items: center; }
+  .sheet-card { border-radius: 18px; padding: 22px 20px 18px; }
+}
+
+.sheet-title {
+  font-size: 20px;
+  font-weight: 700;
+  margin: 4px 2px 14px;
+}
+
+.form-card {
+  background: rgba(255,255,255,.03);
+  border: 1px solid rgba(255,255,255,.06);
+  border-radius: 14px;
+  padding: 12px;
+}
+
+.form-row + .form-row { margin-top: 12px; }
+
+.label {
+  display: block;
+  font-size: 12px;
+  letter-spacing: .02em;
+  color: rgba(255,255,255,.7);
+  margin: 0 0 6px 2px;
+}
+
+.input,
+.select {
+  width: 100%;
+  height: 44px;
+  border-radius: 12px;
+  border: 1px solid rgba(255,255,255,.08);
+  background: linear-gradient(180deg, rgba(255,255,255,.04), rgba(255,255,255,.02));
+  color: #fff;
+  padding: 0 14px;
+}
+
+.input::placeholder { color: rgba(255,255,255,.35); }
+
+/* faux custom select */
+.select-wrap {
+  position: relative;
+}
+.select {
+  appearance: none;
+  -webkit-appearance: none;
+  padding-right: 34px;
+  cursor: pointer;
+}
+.select:focus { outline: 2px solid rgba(241,98,2,.45); outline-offset: 2px; }
+.chev {
+  position: absolute; right: 12px; top: 50%;
+  transform: translateY(-50%);
+  pointer-events: none;
+  color: rgba(255,255,255,.55);
+}
+
+/* actions */
+.sheet-actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-top: 14px;
+}
+
+.btn {
+  height: 46px;
+  border-radius: 14px;
+  font-weight: 700;
+  border: 1px solid transparent;
+}
+
+.btn.ghost {
+  background: rgba(255,255,255,.06);
+  border-color: rgba(255,255,255,.08);
+  color: #fff;
+}
+
+.btn.primary {
+  background: #F16202;
+  color: #0d0d0f;
+  box-shadow: 0 10px 24px rgba(241,98,2,.25);
+}
+
+.btn.wide { grid-column: 2 / 3; } /* primary on right, full width on its column */
+
+@media (min-width: 640px) {
+  .sheet-actions { grid-template-columns: 140px 1fr; }
+  .btn.wide { grid-column: auto; }
+}
