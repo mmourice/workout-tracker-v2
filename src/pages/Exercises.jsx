@@ -146,57 +146,78 @@ export default function Exercises() {
         ))}
       </div>
 
-      {/* Add Exercise Modal */}
-   <div className="modal">
-  <div className="sheet-card">
-    <h3 className="sheet-title">Add Exercise</h3>
-    <form onSubmit={handleAddExercise}>
-      <div className="form-card">
-        <div className="form-row">
-          <label className="label">Name</label>
-          <input
-            className="input"
-            placeholder="e.g., Incline Dumbbell Press"
-            value={newName}
-            onChange={(e) => setNewName(e.target.value)}
-          />
+     {/* Add Exercise – bottom sheet modal */}
+{showAdd && (
+  <div
+    className="sheet-backdrop"
+    onClick={() => setShowAdd(false)}
+  >
+    <div
+      className="sheet-card"
+      onClick={(e) => e.stopPropagation()}
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="add-ex-title"
+    >
+      <h3 id="add-ex-title" className="sheet-title">Add Exercise</h3>
+
+      <form onSubmit={handleAddExercise}>
+        <div className="form-card">
+          <div className="form-row">
+            <label className="label" htmlFor="ex-name">Name</label>
+            <input
+              id="ex-name"
+              className="input"
+              placeholder="e.g., Incline Dumbbell Press"
+              value={newName}
+              onChange={(e) => setNewName(e.target.value)}
+              required
+            />
+          </div>
+
+          <div className="form-row">
+            <label className="label" htmlFor="ex-group">Group</label>
+            <select
+              id="ex-group"
+              className="select"
+              value={newGroup}
+              onChange={(e) => setNewGroup(e.target.value)}
+            >
+              <option value="Chest">Chest</option>
+              <option value="Back">Back</option>
+              <option value="Shoulders">Shoulders</option>
+              <option value="Legs">Legs</option>
+              <option value="Arms">Arms</option>
+              <option value="Core">Core</option>
+              <option value="Cardio">Cardio</option>
+              <option value="Other">Other</option>
+            </select>
+          </div>
+
+          <div className="form-row">
+            <label className="label" htmlFor="ex-link">Link (YouTube, optional)</label>
+            <input
+              id="ex-link"
+              className="input"
+              placeholder="https://…"
+              value={newLink}
+              onChange={(e) => setNewLink(e.target.value)}
+              inputMode="url"
+            />
+          </div>
         </div>
 
-        <div className="form-row">
-          <label className="label">Group</label>
-          <select
-            className="select"
-            value={newGroup}
-            onChange={(e) => setNewGroup(e.target.value)}
+        <div className="sheet-actions">
+          <button
+            type="button"
+            className="btn ghost"
+            onClick={() => setShowAdd(false)}
           >
-            <option value="Chest">Chest</option>
-            <option value="Back">Back</option>
-            <option value="Shoulders">Shoulders</option>
-            <option value="Legs">Legs</option>
-            <option value="Arms">Arms</option>
-            <option value="Core">Core</option>
-            <option value="Cardio">Cardio</option>
-            <option value="Other">Other</option>
-          </select>
+            Cancel
+          </button>
+          <button type="submit" className="btn primary wide">Add</button>
         </div>
-
-        <div className="form-row">
-          <label className="label">Link (YouTube, optional)</label>
-          <input
-            className="input"
-            placeholder="https://…"
-            value={newLink}
-            onChange={(e) => setNewLink(e.target.value)}
-          />
-        </div>
-      </div>
-
-      <div className="sheet-actions">
-        <button type="button" className="btn ghost" onClick={() => setShowAdd(false)}>Cancel</button>
-        <button type="submit" className="btn primary wide">Add</button>
-      </div>
-    </form>
+      </form>
+    </div>
   </div>
-</div>
-  );
-}
+)}
