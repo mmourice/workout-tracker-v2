@@ -1,7 +1,9 @@
 import React, { useEffect, useMemo, useState } from "react";
 
-/** === Data & Storage helpers === */
-const GROUPS = ["Chest","Back","Shoulders","Legs","Arms","Core","Cardio","Other"];
+/* =========================================
+   Data & storage helpers
+========================================= */
+const GROUPS = ["Chest", "Back", "Shoulders", "Legs", "Arms", "Core", "Cardio", "Other"];
 
 const DEFAULTS = {
   Chest: [
@@ -44,36 +46,55 @@ function loadExercises() {
     if (raw) return JSON.parse(raw);
   } catch {}
   // seed once
-  const seeded = DEFAULTS;
-  try { localStorage.setItem("wt_exercises", JSON.stringify(seeded)); } catch {}
-  return seeded;
+  try {
+    localStorage.setItem("wt_exercises", JSON.stringify(DEFAULTS));
+  } catch {}
+  return DEFAULTS;
 }
 
 function saveExercises(obj) {
-  try { localStorage.setItem("wt_exercises", JSON.stringify(obj)); } catch {}
+  try {
+    localStorage.setItem("wt_exercises", JSON.stringify(obj));
+  } catch {}
 }
 
-/** === Small Modal (inline to keep file simple) === */
-function Modal({ open, onClose, children }) {
+/* =========================================
+   Bottom-sheet modal (inline)
+========================================= */
+function Sheet({ open, onClose, children, titleId }) {
   if (!open) return null;
   return (
-    <div className="modal-backdrop" onClick={onClose}>
-      <div className="modal-card" onClick={(e) => e.stopPropagation()}>
+    <div className="sheet-backdrop" onClick={onClose}>
+      <div
+        className="sheet-card"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby={titleId}
+        onClick={(e) => e.stopPropagation()}
+      >
         {children}
       </div>
     </div>
   );
 }
 
-/** === Exercises Page === */
+/* =========================================
+   Page
+========================================= */
 export default function Exercises() {
   const [db, setDb] = useState(() => loadExercises());
   const [query, setQuery] = useState("");
-  const [adding, setAdding] = useState(false);
-  const [form, setForm] = useState({ name: "", group: "Chest", link: "" });
+
+  // bottom-sheet state
+  const [showAdd, setShowAdd] = useState(false);
+  const [newName, setNewName] = useState("");
+  const [newGroup, setNewGroup] = useState("Chest");
+  const [newLink, setNewLink] = useState("");
 
   // persist on change
-  useEffect(() => { saveExercises(db); }, [db]);
+  useEffect(() => {
+    saveExercises(db);
+  }, [db]);
 
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
@@ -86,20 +107,28 @@ export default function Exercises() {
   }, [db, query]);
 
   function removeExercise(group, name) {
-    setDb(prev => ({ ...prev, [group]: prev[group].filter(n => n !== name) }));
+    setDb((prev) => ({
+      ...prev,
+      [group]: (prev[group] || []).filter((n) => n !== name),
+    }));
   }
 
-  function addExercise(e) {
+  function handleAddExercise(e) {
     e.preventDefault();
-    const name = form.name.trim();
+    const name = newName.trim();
     if (!name) return;
-    setDb(prev => {
-      const list = new Set(prev[form.group] || []);
+
+    setDb((prev) => {
+      const list = new Set(prev[newGroup] || []);
       list.add(name);
-      return { ...prev, [form.group]: [...list] };
+      return { ...prev, [newGroup]: [...list] };
     });
-    setForm({ name: "", group: form.group, link: "" });
-    setAdding(false);
+
+    // optional: store link somewhere later; for now we keep link in future schema
+    setNewName("");
+    setNewGroup(newGroup);
+    setNewLink("");
+    setShowAdd(false);
   }
 
   return (
@@ -113,22 +142,24 @@ export default function Exercises() {
           value={query}
           onChange={(e) => setQuery(e.target.value)}
         />
-        <button className="btn primary" onClick={() => setAdding(true)}>
+        <button className="btn primary" onClick={() => setShowAdd(true)}>
           + Add Exercise
         </button>
       </div>
 
-      {/* Groups list (not collapsible, per your spec) */}
+      {/* Groups list (not collapsible) */}
       <div className="groups">
         {GROUPS.map((g) => (
           <section key={g} className="group">
             <div className="group-head">
               <h2 className="group-title">{g}</h2>
             </div>
+
             <div className="chips">
               {(filtered[g] || []).length === 0 && (
                 <div className="empty">No exercises</div>
               )}
+
               {(filtered[g] || []).map((name) => (
                 <span key={name} className="chip chip-tag">
                   {name}
@@ -136,6 +167,7 @@ export default function Exercises() {
                     className="chip-x"
                     aria-label={`Remove ${name}`}
                     onClick={() => removeExercise(g, name)}
+                    title="Remove"
                   >
                     ×
                   </button>
@@ -146,80 +178,63 @@ export default function Exercises() {
         ))}
       </div>
 
-     {/* Add Exercise – bottom sheet modal */}
-{showAdd && (
-  <div
-    className="sheet-backdrop"
-    onClick={() => setShowAdd(false)}
-  >
-    <div
-      className="sheet-card"
-      onClick={(e) => e.stopPropagation()}
-      role="dialog"
-      aria-modal="true"
-      aria-labelledby="add-ex-title"
-    >
-      <h3 id="add-ex-title" className="sheet-title">Add Exercise</h3>
+      {/* Add Exercise – full-width bottom sheet with a single card that contains all inputs */}
+      <Sheet open={showAdd} onClose={() => setShowAdd(false)} titleId="add-ex-title">
+        <h3 id="add-ex-title" className="sheet-title">Add Exercise</h3>
 
-      <form onSubmit={handleAddExercise}>
-        <div className="form-card">
-          <div className="form-row">
-            <label className="label" htmlFor="ex-name">Name</label>
-            <input
-              id="ex-name"
-              className="input"
-              placeholder="e.g., Incline Dumbbell Press"
-              value={newName}
-              onChange={(e) => setNewName(e.target.value)}
-              required
-            />
+        <form onSubmit={handleAddExercise}>
+          <div className="form-card">
+            <div className="form-row">
+              <label className="label" htmlFor="ex-name">Name</label>
+              <input
+                id="ex-name"
+                className="input"
+                placeholder="e.g., Incline Dumbbell Press"
+                value={newName}
+                onChange={(e) => setNewName(e.target.value)}
+                required
+              />
+            </div>
+
+            <div className="form-row">
+              <label className="label" htmlFor="ex-group">Group</label>
+              <select
+                id="ex-group"
+                className="select"
+                value={newGroup}
+                onChange={(e) => setNewGroup(e.target.value)}
+              >
+                {GROUPS.map((g) => (
+                  <option key={g} value={g}>{g}</option>
+                ))}
+              </select>
+            </div>
+
+            <div className="form-row">
+              <label className="label" htmlFor="ex-link">Link (YouTube, optional)</label>
+              <input
+                id="ex-link"
+                className="input"
+                placeholder="https://…"
+                value={newLink}
+                onChange={(e) => setNewLink(e.target.value)}
+                inputMode="url"
+              />
+            </div>
           </div>
 
-          <div className="form-row">
-            <label className="label" htmlFor="ex-group">Group</label>
-            <select
-              id="ex-group"
-              className="select"
-              value={newGroup}
-              onChange={(e) => setNewGroup(e.target.value)}
+          <div className="sheet-actions">
+            <button
+              type="button"
+              className="btn ghost"
+              onClick={() => setShowAdd(false)}
             >
-              <option value="Chest">Chest</option>
-              <option value="Back">Back</option>
-              <option value="Shoulders">Shoulders</option>
-              <option value="Legs">Legs</option>
-              <option value="Arms">Arms</option>
-              <option value="Core">Core</option>
-              <option value="Cardio">Cardio</option>
-              <option value="Other">Other</option>
-            </select>
+              Cancel
+            </button>
+            <button type="submit" className="btn primary wide">Add</button>
           </div>
-
-          <div className="form-row">
-            <label className="label" htmlFor="ex-link">Link (YouTube, optional)</label>
-            <input
-              id="ex-link"
-              className="input"
-              placeholder="https://…"
-              value={newLink}
-              onChange={(e) => setNewLink(e.target.value)}
-              inputMode="url"
-            />
-          </div>
-        </div>
-
-        <div className="sheet-actions">
-          <button
-            type="button"
-            className="btn ghost"
-            onClick={() => setShowAdd(false)}
-          >
-            Cancel
-          </button>
-          <button type="submit" className="btn primary wide">Add</button>
-        </div>
-      </form>
-
-);
-      }
-export default Exercises; 
-      
+        </form>
+      </Sheet>
+    </div>
+  );
+}
