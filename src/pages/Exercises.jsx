@@ -218,6 +218,5 @@ export default function Exercises() {
           <button type="submit" className="btn primary wide">Add</button>
         </div>
       </form>
-    </div>
   </div>
 )}
