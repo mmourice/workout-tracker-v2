@@ -1293,32 +1293,3 @@ a{ color:inherit; text-decoration: none; }
 /* two inputs side-by-side in qty sheet (we already use .inputs-row in Session) */
 .inputs-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
 @media (max-width: 420px) { .inputs-row { grid-template-columns: 1fr 1fr; } }
-
-/* -------- Plan page -------- */
-.page-head {
-  display: flex; align-items: center; justify-content: space-between;
-  gap: 12px; margin-bottom: 16px;
-}
-.plan-grid { display: grid; gap: 16px; }
-.plan-card {
-  background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
-  border: 1px solid rgba(255,255,255,0.06);
-  border-radius: 18px; padding: 16px;
-  box-shadow: 0 10px 30px rgba(0,0,0,0.35);
-}
-.plan-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 10px; }
-.plan-title { font-size: 18px; font-weight: 700; letter-spacing: 0.3px; }
-.plan-actions { display: flex; align-items: center; gap: 8px; }
-.plan-items { display: flex; flex-wrap: wrap; gap: 8px; }
-
-.chip-btn { cursor: pointer; }
-.chip-mono { opacity: .7; font-variant-numeric: tabular-nums; }
-
-/* Picker groups inside sheet */
-.picker-groups { max-height: 55vh; overflow: auto; display: grid; gap: 8px; }
-.picker-groups .group { padding: 4px 0 10px; border-bottom: 1px solid rgba(255,255,255,0.06); }
-.picker-groups .group:last-child { border-bottom: 0; }
-
-/* two inputs side-by-side in qty sheet (we already use .inputs-row in Session) */
-.inputs-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-@media (max-width: 420px) { .inputs-row { grid-template-columns: 1fr 1fr; } }
