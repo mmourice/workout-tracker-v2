@@ -1315,3 +1315,31 @@ a{ color:inherit; text-decoration: none; }
 @media (max-width: 360px){
   .row-two{ gap:10px; }
 }
+
+/* ---- Orange pill button for plan header ---- */
+.btn.pill.primary.plan-add-ex{
+  background:#ff6600;
+  color:#101010;
+  border:none;
+  padding:10px 16px;
+  border-radius:999px;
+  font-weight:700;
+  box-shadow: 0 8px 24px rgba(255,102,0,.25);
+}
+.btn.pill.primary.plan-add-ex:active{
+  transform:translateY(1px);
+  box-shadow: 0 6px 18px rgba(255,102,0,.22);
+}
+
+/* keep the header layout tidy so the X button doesn't push it */
+.plan-card .plan-head{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+}
+.plan-card .head-actions{
+  display:flex;
+  align-items:center;
+  gap:10px;
+}
