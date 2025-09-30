@@ -248,34 +248,35 @@ export default function Plan() {
       <Sheet open={qtyOpen} onClose={() => setQtyOpen(false)} labelledBy="qty-title">
         <h3 id="qty-title" className="sheet-title">{qtyFor.name}</h3>
         <form onSubmit={addExerciseToPlan}>
-          <div className="form-card inputs-row">
-            <div className="form-row">
-              <label className="label" htmlFor="sets">Sets</label>
-              <input
-                id="sets"
-                className="input"
-                inputMode="numeric"
-                pattern="[0-9]*"
-                value={qtyFor.sets}
-                onChange={(e) =>
-                  setQtyFor((q) => ({ ...q, sets: Math.max(1, parseInt(e.target.value || "0", 10) || 1) }))
-                }
-              />
-            </div>
-            <div className="form-row">
-              <label className="label" htmlFor="reps">Reps</label>
-              <input
-                id="reps"
-                className="input"
-                inputMode="numeric"
-                pattern="[0-9]*"
-                value={qtyFor.reps}
-                onChange={(e) =>
-                  setQtyFor((q) => ({ ...q, reps: Math.max(1, parseInt(e.target.value || "0", 10) || 1) }))
-                }
-              />
-            </div>
-          </div>
+         <div className="form-card row-two">
+  <div className="field">
+    <label className="label" htmlFor="sets">Sets</label>
+    <input
+      id="sets"
+      className="input"
+      inputMode="numeric"
+      pattern="[0-9]*"
+      value={qtyFor.sets}
+      onChange={(e) =>
+        setQtyFor((q) => ({ ...q, sets: Math.max(1, parseInt(e.target.value || "0", 10) || 1) }))
+      }
+    />
+  </div>
+
+  <div className="field">
+    <label className="label" htmlFor="reps">Reps</label>
+    <input
+      id="reps"
+      className="input"
+      inputMode="numeric"
+      pattern="[0-9]*"
+      value={qtyFor.reps}
+      onChange={(e) =>
+        setQtyFor((q) => ({ ...q, reps: Math.max(1, parseInt(e.target.value || "0", 10) || 1) }))
+      }
+    />
+  </div>
+</div>
           <div className="sheet-actions">
             <button type="button" className="btn ghost" onClick={() => setQtyOpen(false)}>
               Cancel
