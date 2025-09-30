@@ -154,9 +154,12 @@ export default function Plan() {
             <div className="plan-head">
               <div className="plan-title">{p.name}</div>
               <div className="plan-actions">
-                <button className="link small" onClick={() => openExercisePicker(p.id)}>
-                  Add exercise
-                </button>
+                <button
+  className="btn pill primary plan-add-ex"
+  onClick={() => openAddExercise(plan.id)}
+>
+  Add exercise
+</button>
                 <button className="icon-x" aria-label="Delete plan" onClick={() => removePlan(p.id)}>
                   ×
                 </button>
