@@ -154,16 +154,23 @@ export default function Plan() {
             <div className="plan-head">
               <div className="plan-title">{p.name}</div>
               <div className="plan-actions">
-                <button
-  className="btn pill primary plan-add-ex"
-  onClick={() => openAddExercise(plan.id)}
->
-  Add exercise
-</button>
-                <button className="icon-x" aria-label="Delete plan" onClick={() => removePlan(p.id)}>
-                  ×
-                </button>
-              </div>
+  <button
+    className="chip-ghost small"
+    type="button"
+    onClick={() => openExercisePicker(p.id)}   // <-- use p.id and existing openExercisePicker
+  >
+    + Add exercise
+  </button>
+
+  <button
+    className="chip-ghost small danger"
+    type="button"
+    aria-label={`Delete plan ${p.name}`}
+    onClick={() => removePlan(p.id)}
+  >
+    ×
+  </button>
+</div>
             </div>
 
             {p.items.length === 0 ? (
@@ -201,7 +208,6 @@ export default function Plan() {
                 placeholder="e.g., Upper A"
                 value={newPlanName}
                 onChange={(e) => setNewPlanName(e.target.value)}
-                autoFocus
                 required
               />
             </div>
