@@ -29,8 +29,7 @@ function loadLogs() {
   }
 }
 
-/* A simple per-exercise working state shape:
-   { [exerciseId]: [{kg:'', reps:''}, ... ] } */
+/* Build initial sets state per exercise id */
 function seedSets(items) {
   const obj = {};
   for (const it of items) {
@@ -45,47 +44,50 @@ export default function Session() {
   const [showTimer, setShowTimer] = useState(false);
 
   /* plans + selection */
-  const [plans, setPlans] = useState(() => loadPlans());
+  const initialPlans = loadPlans();
+  const [plans, setPlans] = useState(initialPlans);
+  const [activePlanId, setActivePlanId] = useState(
+    initialPlans[0]?.id || null
+  );
+
   const planOptions = useMemo(
     () => plans.map((p) => ({ id: p.id, name: p.name })),
     [plans]
   );
-  const [activePlanId, setActivePlanId] = useState(planOptions[0]?.id || null);
-
-  /* selected plan + exercise set state */
   const activePlan = useMemo(
     () => plans.find((p) => p.id === activePlanId) || null,
     [plans, activePlanId]
   );
 
+  /* sets state keyed by exercise id */
   const [setsMap, setSetsMap] = useState(() =>
     activePlan ? seedSets(activePlan.items || []) : {}
   );
 
-  /* when plan changes, reseed sets */
+  /* reseed sets when plan or its items change */
   useEffect(() => {
     setSetsMap(activePlan ? seedSets(activePlan.items || []) : {});
-  }, [activePlanId]); // eslint-disable-line
+  }, [activePlanId, plans]); // re-evaluate if plans change too
 
-  /* ----- set mutations ----- */
+  /* ----- mutations ----- */
   function updateCell(exId, idx, field, value) {
     setSetsMap((m) => {
-      const row = m[exId] ? [...m[exId]] : [];
-      row[idx] = { ...row[idx], [field]: value };
-      return { ...m, [exId]: row };
+      const arr = m[exId] ? [...m[exId]] : [];
+      arr[idx] = { ...arr[idx], [field]: value };
+      return { ...m, [exId]: arr };
     });
   }
   function addSet(exId) {
     setSetsMap((m) => {
-      const row = m[exId] ? [...m[exId]] : [];
-      row.push({ kg: "", reps: "" });
-      return { ...m, [exId]: row };
+      const arr = m[exId] ? [...m[exId]] : [];
+      arr.push({ kg: "", reps: "" });
+      return { ...m, [exId]: arr };
     });
   }
   function removeSet(exId, idx) {
     setSetsMap((m) => {
-      const row = (m[exId] || []).filter((_, i) => i !== idx);
-      return { ...m, [exId]: row.length ? row : [{ kg: "", reps: "" }] };
+      const arr = (m[exId] || []).filter((_, i) => i !== idx);
+      return { ...m, [exId]: arr.length ? arr : [{ kg: "", reps: "" }] };
     });
   }
   function removeExercise(exId) {
@@ -94,7 +96,7 @@ export default function Session() {
       delete copy[exId];
       return copy;
     });
-    // remove from plan view only (doesn't modify saved plan)
+    // visual-only removal in the session; does not modify saved plan
   }
 
   /* ----- end session: save whole workout ----- */
@@ -130,17 +132,17 @@ export default function Session() {
         {planOptions.length === 0 && (
           <div className="empty">No plans yet. Add one in Plan page.</div>
         )}
+
         {planOptions.map((p) => (
           <button
-  key={p.id}
-  className={`plan-chip ${p.id === activePlanId ? "active" : ""}`}
-  onClick={() => setActivePlanId(p.id)}
->
-  {p.name}
-</button>
+            key={p.id}
+            className={`plan-chip ${p.id === activePlanId ? "active" : ""}`}
+            onClick={() => setActivePlanId(p.id)}
+          >
+            {p.name}
+          </button>
         ))}
 
-        {/* stopwatch at row end */}
         <button
           className="timer-btn"
           aria-label="Open rest timer"
@@ -154,55 +156,69 @@ export default function Session() {
       {/* exercise list for the selected plan */}
       {activePlan && (activePlan.items || []).length > 0 ? (
         <div className="stack">
-          {(activePlan.items || []).map((it) => (
-           <div className="exercise-card">
-  <div className="exercise-header">
-    <div className="exercise-title">
-      {ex.name} <span className="exercise-scheme">{ex.sets}×{ex.reps}</span>
-    </div>
+          {(activePlan.items || []).map((ex) => (
+            <div key={ex.id} className="exercise-card">
+              <div className="exercise-header">
+                <div className="exercise-title">
+                  {ex.name}{" "}
+                  <span className="exercise-scheme">
+                    {ex.sets}×{ex.reps}
+                  </span>
+                </div>
 
-    <div className="exercise-actions">
-      <button className="chip" onClick={() => addSet(ex.id)}>+ Add set</button>
-      <button className="icon-x" aria-label="Remove exercise" onClick={() => removeExercise(ex.id)}>×</button>
-    </div>
-  </div>
-
-  {/* ...your sets list below stays the same... */}
-</div>
+                <div className="exercise-actions">
+                  <button className="chip" onClick={() => addSet(ex.id)}>
+                    + Add set
+                  </button>
+                  <button
+                    className="icon-x"
+                    aria-label="Remove exercise"
+                    onClick={() => removeExercise(ex.id)}
+                  >
+                    ×
+                  </button>
+                </div>
+              </div>
 
               <div className="sets-col">
-  {(setMap[ex.id] || []).map((row, i) => (
-    <div key={i} className="inputs-row">
-      <label className="set-label">Set {String(i + 1).padStart(2, "0")}</label>
+                {(setsMap[ex.id] || []).map((row, i) => (
+                  <div key={i} className="inputs-row">
+                    <label className="set-label">
+                      Set {String(i + 1).padStart(2, "0")}
+                    </label>
 
-      {/* reps input */}
-      <input
-        className="input"
-        placeholder="reps"
-        value={row.reps ?? ""}
-        onChange={(e) => updateSet(ex.id, i, "reps", e.target.value)}
-      />
+                    {/* reps */}
+                    <input
+                      className="input"
+                      placeholder="reps"
+                      value={row.reps ?? ""}
+                      onChange={(e) =>
+                        updateCell(ex.id, i, "reps", e.target.value)
+                      }
+                    />
 
-      <div className="spacer" />
+                    <div className="spacer" />
 
-      {/* kg input */}
-      <input
-        className="input"
-        placeholder="kg"
-        value={row.kg ?? ""}
-        onChange={(e) => updateSet(ex.id, i, "kg", e.target.value)}
-      />
+                    {/* kg */}
+                    <input
+                      className="input"
+                      placeholder="kg"
+                      value={row.kg ?? ""}
+                      onChange={(e) =>
+                        updateCell(ex.id, i, "kg", e.target.value)
+                      }
+                    />
 
-      <button
-        className="icon-x sm"
-        aria-label={`Remove set ${i + 1}`}
-        onClick={() => removeSet(ex.id, i)}
-      >
-        ×
-      </button>
-    </div>
-  ))}
-</div>
+                    <button
+                      className="icon-x sm"
+                      aria-label={`Remove set ${i + 1}`}
+                      onClick={() => removeSet(ex.id, i)}
+                    >
+                      ×
+                    </button>
+                  </div>
+                ))}
+              </div>
             </div>
           ))}
         </div>
