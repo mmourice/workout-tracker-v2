@@ -1,119 +1,241 @@
-// src/pages/Session.jsx
-import React, { useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import RestTimer from "../components/RestTimer.jsx";
 import { StopwatchIcon } from "../Icons.jsx";
 
+/* ---------- storage keys ---------- */
+const PLANS_KEY = "wt_plans";
+const LOGS_KEY = "wt_logs";
+
+/* ---------- helpers ---------- */
+function loadPlans() {
+  try {
+    const raw = localStorage.getItem(PLANS_KEY);
+    return raw ? JSON.parse(raw) : [];
+  } catch {
+    return [];
+  }
+}
+function saveLogs(arr) {
+  try {
+    localStorage.setItem(LOGS_KEY, JSON.stringify(arr));
+  } catch {}
+}
+function loadLogs() {
+  try {
+    const raw = localStorage.getItem(LOGS_KEY);
+    return raw ? JSON.parse(raw) : [];
+  } catch {
+    return [];
+  }
+}
+
+/* A simple per-exercise working state shape:
+   { [exerciseId]: [{kg:'', reps:''}, ... ] } */
+function seedSets(items) {
+  const obj = {};
+  for (const it of items) {
+    const count = Math.max(1, Number(it.sets || 1));
+    obj[it.id] = Array.from({ length: count }, () => ({ kg: "", reps: "" }));
+  }
+  return obj;
+}
+
 export default function Session() {
-  // ----- state -----
-  const [sets, setSets] = useState([
-    { id: 1, kg: "", reps: "" },
-    { id: 2, kg: "", reps: "" },
-  ]);
+  /* rest timer */
   const [showTimer, setShowTimer] = useState(false);
 
-  // ----- helpers / handlers -----
-  const makeSet = (nextId) => ({ id: nextId, kg: "", reps: "" });
+  /* plans + selection */
+  const [plans, setPlans] = useState(() => loadPlans());
+  const planOptions = useMemo(
+    () => plans.map((p) => ({ id: p.id, name: p.name })),
+    [plans]
+  );
+  const [activePlanId, setActivePlanId] = useState(planOptions[0]?.id || null);
 
-  const addSet = () => {
-    setSets((prev) => {
-      const nextId = prev.length ? prev[prev.length - 1].id + 1 : 1;
-      return [...prev, makeSet(nextId)];
+  /* selected plan + exercise set state */
+  const activePlan = useMemo(
+    () => plans.find((p) => p.id === activePlanId) || null,
+    [plans, activePlanId]
+  );
+
+  const [setsMap, setSetsMap] = useState(() =>
+    activePlan ? seedSets(activePlan.items || []) : {}
+  );
+
+  /* when plan changes, reseed sets */
+  useEffect(() => {
+    setSetsMap(activePlan ? seedSets(activePlan.items || []) : {});
+  }, [activePlanId]); // eslint-disable-line
+
+  /* ----- set mutations ----- */
+  function updateCell(exId, idx, field, value) {
+    setSetsMap((m) => {
+      const row = m[exId] ? [...m[exId]] : [];
+      row[idx] = { ...row[idx], [field]: value };
+      return { ...m, [exId]: row };
     });
-  };
+  }
+  function addSet(exId) {
+    setSetsMap((m) => {
+      const row = m[exId] ? [...m[exId]] : [];
+      row.push({ kg: "", reps: "" });
+      return { ...m, [exId]: row };
+    });
+  }
+  function removeSet(exId, idx) {
+    setSetsMap((m) => {
+      const row = (m[exId] || []).filter((_, i) => i !== idx);
+      return { ...m, [exId]: row.length ? row : [{ kg: "", reps: "" }] };
+    });
+  }
+  function removeExercise(exId) {
+    setSetsMap((m) => {
+      const copy = { ...m };
+      delete copy[exId];
+      return copy;
+    });
+    // remove from plan view only (doesn't modify saved plan)
+  }
 
-  const removeSet = (id) => {
-    setSets((prev) => prev.filter((s) => s.id !== id));
-  };
-
-  const updateSet = (id, field, value) => {
-    setSets((prev) => prev.map((s) => (s.id === id ? { ...s, [field]: value } : s)));
-  };
-
-  const saveSession = () => {
-    const entry = {
-      id: crypto.randomUUID ? crypto.randomUUID() : String(Date.now()),
+  /* ----- end session: save whole workout ----- */
+  function endSession() {
+    if (!activePlan) return;
+    const payload = {
+      id: crypto.randomUUID?.() || String(Date.now()),
       dateISO: new Date().toISOString(),
-      exerciseName: "Current Exercise", // replace later when selecting exercise
-      sets: sets.map((s) => ({ kg: s.kg || "0", reps: s.reps || "0" })),
+      planId: activePlan.id,
+      planName: activePlan.name,
+      exercises: (activePlan.items || []).map((it) => ({
+        id: it.id,
+        name: it.name,
+        target: { sets: it.sets, reps: it.reps },
+        sets: (setsMap[it.id] || []).map((s) => ({
+          kg: s.kg || "0",
+          reps: s.reps || "0",
+        })),
+      })),
     };
+    const logs = loadLogs();
+    logs.push(payload);
+    saveLogs(logs);
+    alert("Session saved ✔");
+  }
 
-    try {
-      const raw = localStorage.getItem("wt_logs");
-      const arr = raw ? JSON.parse(raw) : [];
-      arr.push(entry);
-      localStorage.setItem("wt_logs", JSON.stringify(arr));
-      alert("Session saved ✔");
-    } catch (e) {
-      console.error(e);
-      alert("Could not save session.");
-    }
-  };
-
-  // ----- render -----
   return (
     <div className="page">
-      <h1 className="page-title">Session</h1>
+      <h1 className="title">Session</h1>
 
-      <div className="card session-card">
-        <div className="card-head">
-          <h2>Current Exercise</h2>
+      {/* plan chips row */}
+      <div className="chip-row" style={{ marginBottom: 12, flexWrap: "wrap" }}>
+        {planOptions.length === 0 && (
+          <div className="empty">No plans yet. Add one in Plan page.</div>
+        )}
+        {planOptions.map((p) => (
+          <button
+            key={p.id}
+            className={
+              "chip " + (p.id === activePlanId ? "pill primary" : "chip-btn")
+            }
+            onClick={() => setActivePlanId(p.id)}
+          >
+            {p.name}
+          </button>
+        ))}
 
-          {/* Stopwatch hit-area (opens modal) */}
-          <div className="stopwatch-hit" onClick={() => setShowTimer(true)} aria-label="Open rest timer">
-            <StopwatchIcon />
-          </div>
-        </div>
+        {/* stopwatch at row end */}
+        <button
+          className="timer-btn"
+          aria-label="Open rest timer"
+          onClick={() => setShowTimer(true)}
+          style={{ marginLeft: "auto" }}
+        >
+          <StopwatchIcon />
+        </button>
+      </div>
 
-        {/* Sets list (single column) */}
-        <div className="sets-col">
-          {sets.map((s) => (
-            <div key={s.id} className="set-card">
-              <div className="set-head">
-                <span className="set-title">Set {s.id}</span>
-                <button
-                  className="icon-x"
-                  aria-label={`Remove set ${s.id}`}
-                  onClick={() => removeSet(s.id)}
-                >
-                  ×
-                </button>
+      {/* exercise list for the selected plan */}
+      {activePlan && (activePlan.items || []).length > 0 ? (
+        <div className="stack">
+          {(activePlan.items || []).map((it) => (
+            <div key={it.id} className="card">
+              <div className="card-head">
+                <div className="card-title">
+                  <div style={{ fontWeight: 700 }}>{it.name}</div>
+                  <div className="chip-mono" style={{ opacity: 0.8 }}>
+                    {it.sets}×{it.reps}
+                  </div>
+                </div>
+                <div className="plan-actions">
+                  <button
+                    className="chip-ghost small"
+                    onClick={() => addSet(it.id)}
+                  >
+                    + Add set
+                  </button>
+                  <button
+                    className="chip-ghost small danger"
+                    onClick={() => removeExercise(it.id)}
+                    aria-label="Remove exercise"
+                  >
+                    ×
+                  </button>
+                </div>
               </div>
 
-              <div className="inputs-row">
-                <input
-                  inputMode="decimal"
-                  className="input"
-                  placeholder="kg"
-                  value={s.kg}
-                  onChange={(e) => updateSet(s.id, "kg", e.target.value)}
-                />
-                <input
-                  inputMode="numeric"
-                  className="input"
-                  placeholder="reps"
-                  value={s.reps}
-                  onChange={(e) => updateSet(s.id, "reps", e.target.value)}
-                />
+              <div className="sets-col">
+                {(setsMap[it.id] || []).map((row, i) => (
+                  <div key={i} className="inputs-row">
+                    <div className="label-s">Set {String(i + 1).padStart(2, "0")}</div>
+
+                    <input
+                      className="input"
+                      placeholder="kg"
+                      inputMode="decimal"
+                      value={row.kg}
+                      onChange={(e) =>
+                        updateCell(it.id, i, "kg", e.target.value)
+                      }
+                    />
+                    <input
+                      className="input"
+                      placeholder="reps"
+                      inputMode="numeric"
+                      value={row.reps}
+                      onChange={(e) =>
+                        updateCell(it.id, i, "reps", e.target.value)
+                      }
+                    />
+
+                    <button
+                      className="icon-x"
+                      onClick={() => removeSet(it.id, i)}
+                      aria-label={`Remove set ${i + 1}`}
+                    >
+                      ×
+                    </button>
+                  </div>
+                ))}
               </div>
             </div>
           ))}
         </div>
+      ) : (
+        <div className="empty">This plan has no exercises yet.</div>
+      )}
 
-        <div className="actions-col">
-          <button className="btn-primary wide" onClick={addSet}>
-            + Add set
-          </button>
-
-          <div style={{ height: 12 }} />
-
-          <button className="btn-secondary wide" onClick={saveSession}>
-            Save Session
+      {/* End session */}
+      {activePlan && (
+        <div style={{ marginTop: 20 }}>
+          <button className="btn primary wide" onClick={endSession}>
+            End Session
           </button>
         </div>
-      </div>
+      )}
 
-      {/* Rest timer modal */}
-      {showTimer && <RestTimer onClose={() => setShowTimer(false)} />}
+      {/* timer sheet */}
+      {showTimer && (
+        <RestTimer open={showTimer} onClose={() => setShowTimer(false)} />
+      )}
     </div>
   );
 }
