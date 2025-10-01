@@ -155,30 +155,20 @@ export default function Session() {
       {activePlan && (activePlan.items || []).length > 0 ? (
         <div className="stack">
           {(activePlan.items || []).map((it) => (
-            <div key={it.id} className="card">
-              <div className="card-head">
-                <div className="card-title">
-                  <div style={{ fontWeight: 700 }}>{it.name}</div>
-                  <div className="chip-mono" style={{ opacity: 0.8 }}>
-                    {it.sets}×{it.reps}
-                  </div>
-                </div>
-                <div className="plan-actions">
-                  <button
-                    className="chip-ghost small"
-                    onClick={() => addSet(it.id)}
-                  >
-                    + Add set
-                  </button>
-                  <button
-                    className="chip-ghost small danger"
-                    onClick={() => removeExercise(it.id)}
-                    aria-label="Remove exercise"
-                  >
-                    ×
-                  </button>
-                </div>
-              </div>
+           <div className="exercise-card">
+  <div className="exercise-header">
+    <div className="exercise-title">
+      {ex.name} <span className="exercise-scheme">{ex.sets}×{ex.reps}</span>
+    </div>
+
+    <div className="exercise-actions">
+      <button className="chip" onClick={() => addSet(ex.id)}>+ Add set</button>
+      <button className="icon-x" aria-label="Remove exercise" onClick={() => removeExercise(ex.id)}>×</button>
+    </div>
+  </div>
+
+  {/* ...your sets list below stays the same... */}
+</div>
 
               <div className="sets-col">
                 {(setsMap[it.id] || []).map((row, i) => (
