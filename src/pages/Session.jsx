@@ -132,14 +132,12 @@ export default function Session() {
         )}
         {planOptions.map((p) => (
           <button
-            key={p.id}
-            className={
-              "chip " + (p.id === activePlanId ? "pill primary" : "chip-btn")
-            }
-            onClick={() => setActivePlanId(p.id)}
-          >
-            {p.name}
-          </button>
+  key={p.id}
+  className={`plan-chip ${p.id === activePlanId ? "active" : ""}`}
+  onClick={() => setActivePlanId(p.id)}
+>
+  {p.name}
+</button>
         ))}
 
         {/* stopwatch at row end */}
