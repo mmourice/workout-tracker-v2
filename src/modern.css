@@ -1418,3 +1418,51 @@ input, select, textarea { font-size: 16px; }
   align-items: center;
   gap: 8px;
 }
+
+/* --- Session exercise card header fix --- */
+.exercise-card { position: relative; }
+
+.exercise-header {
+  position: relative;
+  padding-right: 132px;          /* room for the two action buttons */
+  min-height: 44px;              /* keeps space under the absolute actions */
+  margin-bottom: 10px;
+}
+
+.exercise-title {
+  font-weight: 800;
+  font-size: 22px;
+  line-height: 1.15;
+  color: #fff;
+  word-break: break-word;
+  display: inline-block;
+  max-width: 100%;
+}
+
+/* smaller, mono-ish look for 3×10 */
+.exercise-scheme {
+  font-weight: 700;
+  opacity: .9;
+  margin-left: 6px;
+}
+
+/* the action buttons live here so the title can't push them */
+.exercise-actions {
+  position: absolute;
+  top: 0;
+  right: 0;
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+/* keep your existing .chip/.icon-x styles; these just align sizes */
+.exercise-actions .chip { height: 40px; padding: 0 14px; }
+.exercise-actions .icon-x { width: 40px; height: 40px; font-size: 20px; }
+
+.exercise-title {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
