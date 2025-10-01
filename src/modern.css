@@ -1396,3 +1396,25 @@ input, select, textarea { font-size: 16px; }
   border-color: #ff6600;
   color: #fff; /* keep text white (or set to #000 if you prefer black on orange) */
 }
+
+.exercise-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 10px;
+}
+
+.exercise-title {
+  flex: 1;
+  font-size: 18px;
+  font-weight: 700;
+  color: #fff;
+  word-break: break-word; /* so long names wrap nicely */
+}
+
+.exercise-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
