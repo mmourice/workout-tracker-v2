@@ -1343,3 +1343,35 @@ a{ color:inherit; text-decoration: none; }
   align-items:center;
   gap:10px;
 }
+
+/* plan header right-side controls */
+.plan-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+/* unified ghost pill for actions (Add exercise / ×) */
+.chip-ghost {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 36px;
+  padding: 0 14px;
+  border-radius: 999px;
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.1);
+  color: var(--fg-2, #ccc);
+  font-weight: 600;
+  letter-spacing: .2px;
+  -webkit-tap-highlight-color: transparent;
+}
+.chip-ghost.small { height: 32px; padding: 0 12px; font-size: 14px; }
+.chip-ghost:hover { background: rgba(255,255,255,0.06); }
+.chip-ghost:active { transform: translateY(1px); }
+
+.chip-ghost.danger { color: #ff6600; border-color: rgba(255,102,0,0.35); }
+.chip-ghost.danger:hover { background: rgba(255,102,0,0.08); }
+
+/* iOS: font-size >= 16px prevents auto-zoom on focus */
+input, select, textarea { font-size: 16px; }
