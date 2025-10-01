@@ -171,39 +171,38 @@ export default function Session() {
 </div>
 
               <div className="sets-col">
-                {(setsMap[it.id] || []).map((row, i) => (
-                  <div key={i} className="inputs-row">
-                    <div className="label-s">Set {String(i + 1).padStart(2, "0")}</div>
+  {(setMap[ex.id] || []).map((row, i) => (
+    <div key={i} className="inputs-row">
+      <label className="set-label">Set {String(i + 1).padStart(2, "0")}</label>
 
-                    <input
-                      className="input"
-                      placeholder="kg"
-                      inputMode="decimal"
-                      value={row.kg}
-                      onChange={(e) =>
-                        updateCell(it.id, i, "kg", e.target.value)
-                      }
-                    />
-                    <input
-                      className="input"
-                      placeholder="reps"
-                      inputMode="numeric"
-                      value={row.reps}
-                      onChange={(e) =>
-                        updateCell(it.id, i, "reps", e.target.value)
-                      }
-                    />
+      {/* reps input */}
+      <input
+        className="input"
+        placeholder="reps"
+        value={row.reps ?? ""}
+        onChange={(e) => updateSet(ex.id, i, "reps", e.target.value)}
+      />
 
-                    <button
-                      className="icon-x"
-                      onClick={() => removeSet(it.id, i)}
-                      aria-label={`Remove set ${i + 1}`}
-                    >
-                      ×
-                    </button>
-                  </div>
-                ))}
-              </div>
+      <div className="spacer" />
+
+      {/* kg input */}
+      <input
+        className="input"
+        placeholder="kg"
+        value={row.kg ?? ""}
+        onChange={(e) => updateSet(ex.id, i, "kg", e.target.value)}
+      />
+
+      <button
+        className="icon-x sm"
+        aria-label={`Remove set ${i + 1}`}
+        onClick={() => removeSet(ex.id, i)}
+      >
+        ×
+      </button>
+    </div>
+  ))}
+</div>
             </div>
           ))}
         </div>
