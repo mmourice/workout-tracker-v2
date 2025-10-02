@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo, useState } from "react";
+import Layout from "../components/Layout.jsx";
 
 /* ------------ Storage helpers ------------ */
 const PLANS_KEY = "wt_plans";
@@ -9,21 +10,19 @@ function loadPlans() {
     const raw = localStorage.getItem(PLANS_KEY);
     if (raw) return JSON.parse(raw);
   } catch {}
-  return []; // no seed
+  return [];
 }
-
 function savePlans(plans) {
   try {
     localStorage.setItem(PLANS_KEY, JSON.stringify(plans));
   } catch {}
 }
-
 function loadExercisesDB() {
   try {
     const raw = localStorage.getItem(EXS_KEY);
     if (raw) return JSON.parse(raw);
   } catch {}
-  return {}; // fallback
+  return {};
 }
 
 /* ------------ Tiny primitives (reuse our sheet/modal styles) ------------ */
@@ -57,17 +56,25 @@ export default function Plan() {
   const [pickerQuery, setPickerQuery] = useState("");
 
   const [qtyOpen, setQtyOpen] = useState(false);
-  const [qtyFor, setQtyFor] = useState({ planId: null, name: "", sets: 3, reps: 10 });
+  const [qtyFor, setQtyFor] = useState({
+    planId: null,
+    name: "",
+    sets: 3,
+    reps: 10,
+  });
 
   // Persist plans
   useEffect(() => savePlans(plans), [plans]);
+
   // Lock scroll when any sheet is open
   const anySheet = showAddPlan || pickerOpen || qtyOpen;
   useEffect(() => {
     if (!anySheet) return;
     const prev = document.body.style.overflow;
     document.body.style.overflow = "hidden";
-    return () => (document.body.style.overflow = prev);
+    return () => {
+      document.body.style.overflow = prev;
+    };
   }, [anySheet]);
 
   /* ---------- CRUD: plans ---------- */
@@ -89,18 +96,18 @@ export default function Plan() {
   function openExercisePicker(planId) {
     setPickerPlanId(planId);
     setPickerQuery("");
-    // refresh ex DB in case user edited Exercises page
-    setExDB(loadExercisesDB());
+    setExDB(loadExercisesDB()); // refresh from Exercises page
     setPickerOpen(true);
   }
 
   /* ---------- Add exercise to plan (through picker + qty dialog) ---------- */
-  // Exercise list flattened with search
   const pickerList = useMemo(() => {
     const q = pickerQuery.trim().toLowerCase();
     const rows = [];
     Object.keys(exDB).forEach((group) => {
-      const list = (exDB[group] || []).filter((n) => n.toLowerCase().includes(q));
+      const list = (exDB[group] || []).filter((n) =>
+        n.toLowerCase().includes(q)
+      );
       if (list.length) rows.push({ group, list });
     });
     return rows;
@@ -121,7 +128,10 @@ export default function Plan() {
           ? p
           : {
               ...p,
-              items: [...p.items, { id: crypto.randomUUID?.() || name + Date.now(), name, sets, reps }],
+              items: [
+                ...p.items,
+                { id: crypto.randomUUID?.() || name + Date.now(), name, sets, reps },
+              ],
             }
       )
     );
@@ -131,16 +141,19 @@ export default function Plan() {
   function removeItem(planId, itemId) {
     setPlans((ps) =>
       ps.map((p) =>
-        p.id !== planId ? p : { ...p, items: p.items.filter((it) => it.id !== itemId) }
+        p.id !== planId
+          ? p
+          : { ...p, items: p.items.filter((it) => it.id !== itemId) }
       )
     );
   }
 
   return (
-    <div className="page">
+    <Layout title="Plan" active="plan">
       <div className="page-head">
-        <h1 className="title">Plan</h1>
-        <button className="btn primary" onClick={() => setShowAddPlan(true)}>+ Add plan</button>
+        <button className="btn primary" onClick={() => setShowAddPlan(true)}>
+          + Add plan
+        </button>
       </div>
 
       {/* Plans grid */}
@@ -154,23 +167,23 @@ export default function Plan() {
             <div className="plan-head">
               <div className="plan-title">{p.name}</div>
               <div className="plan-actions">
-  <button
-    className="chip-ghost small"
-    type="button"
-    onClick={() => openExercisePicker(p.id)}   // <-- use p.id and existing openExercisePicker
-  >
-    + Add exercise
-  </button>
-
-  <button
-    className="chip-ghost small danger"
-    type="button"
-    aria-label={`Delete plan ${p.name}`}
-    onClick={() => removePlan(p.id)}
-  >
-    ×
-  </button>
-</div>
+                <button
+                  className="btn pill primary"
+                  type="button"
+                  onClick={() => openExercisePicker(p.id)}
+                >
+                  + Add exercise
+                </button>
+                <button
+                  className="icon-x"
+                  type="button"
+                  aria-label={`Delete plan ${p.name}`}
+                  onClick={() => removePlan(p.id)}
+                  title="Delete plan"
+                >
+                  ×
+                </button>
+              </div>
             </div>
 
             {p.items.length === 0 ? (
@@ -179,7 +192,8 @@ export default function Plan() {
               <div className="plan-items">
                 {p.items.map((it) => (
                   <span key={it.id} className="chip chip-tag">
-                    {it.name} <span className="chip-mono">&nbsp;{it.sets}×{it.reps}</span>
+                    {it.name}
+                    <span className="chip-mono">&nbsp;{it.sets}×{it.reps}</span>
                     <button
                       className="chip-x"
                       aria-label={`Remove ${it.name}`}
@@ -196,7 +210,11 @@ export default function Plan() {
       </div>
 
       {/* Sheet: Add Plan */}
-      <Sheet open={showAddPlan} onClose={() => setShowAddPlan(false)} labelledBy="add-plan-title">
+      <Sheet
+        open={showAddPlan}
+        onClose={() => setShowAddPlan(false)}
+        labelledBy="add-plan-title"
+      >
         <h3 id="add-plan-title" className="sheet-title">Add Plan</h3>
         <form onSubmit={createPlan}>
           <div className="form-card">
@@ -208,12 +226,17 @@ export default function Plan() {
                 placeholder="e.g., Upper A"
                 value={newPlanName}
                 onChange={(e) => setNewPlanName(e.target.value)}
-                required
+                // removed autoFocus to avoid mobile zoom-on-open
+                inputMode="text"
               />
             </div>
           </div>
           <div className="sheet-actions">
-            <button type="button" className="btn ghost" onClick={() => setShowAddPlan(false)}>
+            <button
+              type="button"
+              className="btn ghost"
+              onClick={() => setShowAddPlan(false)}
+            >
               Cancel
             </button>
             <button type="submit" className="btn primary wide">Create</button>
@@ -222,7 +245,11 @@ export default function Plan() {
       </Sheet>
 
       {/* Sheet: Exercise Picker */}
-      <Sheet open={pickerOpen} onClose={() => setPickerOpen(false)} labelledBy="picker-title">
+      <Sheet
+        open={pickerOpen}
+        onClose={() => setPickerOpen(false)}
+        labelledBy="picker-title"
+      >
         <h3 id="picker-title" className="sheet-title">Exercises</h3>
 
         <div className="form-row">
@@ -243,7 +270,11 @@ export default function Plan() {
               </div>
               <div className="chips">
                 {list.map((name) => (
-                  <button key={name} className="chip chip-btn" onClick={() => chooseExercise(name)}>
+                  <button
+                    key={name}
+                    className="chip chip-btn"
+                    onClick={() => chooseExercise(name)}
+                  >
                     {name}
                   </button>
                 ))}
@@ -254,46 +285,61 @@ export default function Plan() {
       </Sheet>
 
       {/* Sheet: Sets / Reps */}
-      <Sheet open={qtyOpen} onClose={() => setQtyOpen(false)} labelledBy="qty-title">
+      <Sheet
+        open={qtyOpen}
+        onClose={() => setQtyOpen(false)}
+        labelledBy="qty-title"
+      >
         <h3 id="qty-title" className="sheet-title">{qtyFor.name}</h3>
         <form onSubmit={addExerciseToPlan}>
-         <div className="form-card row-two">
-  <div className="field">
-    <label className="label" htmlFor="sets">Sets</label>
-    <input
-      id="sets"
-      className="input"
-      inputMode="numeric"
-      pattern="[0-9]*"
-      value={qtyFor.sets}
-      onChange={(e) =>
-        setQtyFor((q) => ({ ...q, sets: Math.max(1, parseInt(e.target.value || "0", 10) || 1) }))
-      }
-    />
-  </div>
+          <div className="form-card row-two">
+            <div className="field">
+              <label className="label" htmlFor="sets">Sets</label>
+              <input
+                id="sets"
+                className="input"
+                inputMode="numeric"
+                pattern="[0-9]*"
+                value={qtyFor.sets}
+                onChange={(e) =>
+                  setQtyFor((q) => ({
+                    ...q,
+                    sets: Math.max(1, parseInt(e.target.value || "0", 10) || 1),
+                  }))
+                }
+              />
+            </div>
 
-  <div className="field">
-    <label className="label" htmlFor="reps">Reps</label>
-    <input
-      id="reps"
-      className="input"
-      inputMode="numeric"
-      pattern="[0-9]*"
-      value={qtyFor.reps}
-      onChange={(e) =>
-        setQtyFor((q) => ({ ...q, reps: Math.max(1, parseInt(e.target.value || "0", 10) || 1) }))
-      }
-    />
-  </div>
-</div>
+            <div className="field">
+              <label className="label" htmlFor="reps">Reps</label>
+              <input
+                id="reps"
+                className="input"
+                inputMode="numeric"
+                pattern="[0-9]*"
+                value={qtyFor.reps}
+                onChange={(e) =>
+                  setQtyFor((q) => ({
+                    ...q,
+                    reps: Math.max(1, parseInt(e.target.value || "0", 10) || 1),
+                  }))
+                }
+              />
+            </div>
+          </div>
+
           <div className="sheet-actions">
-            <button type="button" className="btn ghost" onClick={() => setQtyOpen(false)}>
+            <button
+              type="button"
+              className="btn ghost"
+              onClick={() => setQtyOpen(false)}
+            >
               Cancel
             </button>
             <button type="submit" className="btn primary wide">Add</button>
           </div>
         </form>
       </Sheet>
-    </div>
+    </Layout>
   );
 }
