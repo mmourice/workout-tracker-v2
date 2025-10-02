@@ -2,26 +2,22 @@ import React, { useEffect, useMemo, useState } from "react";
 import RestTimer from "../components/RestTimer.jsx";
 import { StopwatchIcon } from "../Icons.jsx";
 
-/* ---------- storage keys ---------- */
+/* ========= storage ========= */
 const PLANS_KEY = "wt_plans";
 const LOGS_KEY = "wt_logs";
 
-/* ---------- helpers ---------- */
-function loadPlans() {
+function safeParse(json, fallback) {
   try {
-    const raw = localStorage.getItem(PLANS_KEY);
-    return raw ? JSON.parse(raw) : [];
+    return json ? JSON.parse(json) : fallback;
   } catch {
-    return [];
+    return fallback;
   }
 }
+function loadPlans() {
+  return safeParse(localStorage.getItem(PLANS_KEY), []);
+}
 function loadLogs() {
-  try {
-    const raw = localStorage.getItem(LOGS_KEY);
-    return raw ? JSON.parse(raw) : [];
-  } catch {
-    return [];
-  }
+  return safeParse(localStorage.getItem(LOGS_KEY), []);
 }
 function saveLogs(arr) {
   try {
@@ -30,9 +26,9 @@ function saveLogs(arr) {
 }
 
 /* Build initial sets map from a plan's items */
-function seedSets(items) {
+function seedSets(items = []) {
   const obj = {};
-  for (const it of items || []) {
+  for (const it of items) {
     const count = Math.max(1, Number(it.sets || 1));
     obj[it.id] = Array.from({ length: count }, () => ({ kg: "", reps: "" }));
   }
@@ -40,49 +36,44 @@ function seedSets(items) {
 }
 
 export default function Session() {
-  /* Rest timer */
+  /* timer */
   const [showTimer, setShowTimer] = useState(false);
 
-  /* Plans + selection */
-  const [plans] = useState(() => loadPlans());
+  /* plans + selection */
+  const [plans, setPlans] = useState(() => loadPlans());
   const planOptions = useMemo(
     () => plans.map((p) => ({ id: p.id, name: p.name })),
     [plans]
   );
-
   const [activePlanId, setActivePlanId] = useState(
-    planOptions[0]?.id || null
+    planOptions.length ? planOptions[0].id : null
   );
 
-  /* Keep activePlanId valid if plans list changes */
+  /* keep a valid selection when plans change */
   useEffect(() => {
     if (!plans.length) {
       setActivePlanId(null);
       return;
     }
-    if (!activePlanId || !plans.some((p) => p.id === activePlanId)) {
+    if (!plans.some((p) => p.id === activePlanId)) {
       setActivePlanId(plans[0].id);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [plans]);
+  }, [plans]); // eslint-disable-line
 
   const activePlan = useMemo(
     () => plans.find((p) => p.id === activePlanId) || null,
     [plans, activePlanId]
   );
 
-  /* Sets state per exercise */
+  /* per-exercise input state */
   const [setsMap, setSetsMap] = useState(() =>
     activePlan ? seedSets(activePlan.items) : {}
   );
-
-  /* Reseed sets when the selected plan changes */
   useEffect(() => {
     setSetsMap(activePlan ? seedSets(activePlan.items) : {});
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [activePlanId]);
+  }, [activePlanId]); // reseed on plan change
 
-  /* ----- set mutations ----- */
+  /* mutations */
   function updateCell(exId, idx, field, value) {
     setSetsMap((m) => {
       const row = m[exId] ? [...m[exId]] : [];
@@ -90,7 +81,6 @@ export default function Session() {
       return { ...m, [exId]: row };
     });
   }
-
   function addSet(exId) {
     setSetsMap((m) => {
       const row = m[exId] ? [...m[exId]] : [];
@@ -98,14 +88,12 @@ export default function Session() {
       return { ...m, [exId]: row };
     });
   }
-
   function removeSet(exId, idx) {
     setSetsMap((m) => {
       const row = (m[exId] || []).filter((_, i) => i !== idx);
       return { ...m, [exId]: row.length ? row : [{ kg: "", reps: "" }] };
     });
   }
-
   function removeExercise(exId) {
     setSetsMap((m) => {
       const copy = { ...m };
@@ -114,11 +102,11 @@ export default function Session() {
     });
   }
 
-  /* ----- end session: save whole workout ----- */
+  /* save session */
   function endSession() {
     if (!activePlan) return;
     const payload = {
-      id: crypto.randomUUID?.() || String(Date.now()),
+      id: String(Date.now()),
       dateISO: new Date().toISOString(),
       planId: activePlan.id,
       planName: activePlan.name,
@@ -142,12 +130,11 @@ export default function Session() {
     <div className="page">
       <h1 className="title">Session</h1>
 
-      {/* plan chips row */}
+      {/* plan chips */}
       <div className="chip-row" style={{ marginBottom: 12, flexWrap: "wrap" }}>
         {planOptions.length === 0 && (
-          <div className="empty">No plans yet. Add one in Plan page.</div>
+          <div className="empty">No plans yet. Add one in Plan.</div>
         )}
-
         {planOptions.map((p) => (
           <button
             key={p.id}
@@ -158,6 +145,7 @@ export default function Session() {
           </button>
         ))}
 
+        {/* stopwatch on the far right */}
         <button
           className="timer-btn"
           aria-label="Open rest timer"
@@ -168,7 +156,7 @@ export default function Session() {
         </button>
       </div>
 
-      {/* exercise list for the selected plan */}
+      {/* exercises */}
       {activePlan && (activePlan.items || []).length > 0 ? (
         <div className="stack">
           {(activePlan.items || []).map((it) => (
@@ -182,14 +170,11 @@ export default function Session() {
                 </div>
 
                 <div className="exercise-actions">
-                  <button
-                    className="add-set"
-                    onClick={() => addSet(it.id)}
-                  >
+                  <button className="chip" onClick={() => addSet(it.id)}>
                     + Add set
                   </button>
                   <button
-                    className="delete-set"
+                    className="icon-x"
                     aria-label="Remove exercise"
                     onClick={() => removeExercise(it.id)}
                   >
@@ -225,7 +210,7 @@ export default function Session() {
                     </div>
 
                     <button
-                      className="delete-set sm"
+                      className="icon-x sm"
                       aria-label={`Remove set ${i + 1}`}
                       onClick={() => removeSet(it.id, i)}
                     >
@@ -243,7 +228,7 @@ export default function Session() {
 
       {activePlan && (
         <div style={{ marginTop: 20 }}>
-          <button className="btn primary wide end-session" onClick={endSession}>
+          <button className="btn primary wide" onClick={endSession}>
             End Session
           </button>
         </div>
