@@ -15,11 +15,7 @@ function loadPlans() {
     return [];
   }
 }
-function saveLogs(arr) {
-  try {
-    localStorage.setItem(LOGS_KEY, JSON.stringify(arr));
-  } catch {}
-}
+
 function loadLogs() {
   try {
     const raw = localStorage.getItem(LOGS_KEY);
@@ -28,11 +24,16 @@ function loadLogs() {
     return [];
   }
 }
+function saveLogs(arr) {
+  try {
+    localStorage.setItem(LOGS_KEY, JSON.stringify(arr));
+  } catch {}
+}
 
-/* Build initial sets state per exercise id */
+/* Build initial sets map from a plan's items */
 function seedSets(items) {
   const obj = {};
-  for (const it of items) {
+  for (const it of items || []) {
     const count = Math.max(1, Number(it.sets || 1));
     obj[it.id] = Array.from({ length: count }, () => ({ kg: "", reps: "" }));
   }
@@ -40,63 +41,76 @@ function seedSets(items) {
 }
 
 export default function Session() {
-  /* rest timer */
+  /* Rest timer */
   const [showTimer, setShowTimer] = useState(false);
 
-  /* plans + selection */
-  const initialPlans = loadPlans();
-  const [plans, setPlans] = useState(initialPlans);
-  const [activePlanId, setActivePlanId] = useState(
-    initialPlans[0]?.id || null
-  );
-
+  /* Plans + selection */
+  const [plans, setPlans] = useState(() => loadPlans());
   const planOptions = useMemo(
     () => plans.map((p) => ({ id: p.id, name: p.name })),
     [plans]
   );
+
+  const [activePlanId, setActivePlanId] = useState(
+    planOptions[0]?.id || null
+  );
+
+  /* Keep activePlanId valid if plans list changes */
+  useEffect(() => {
+    if (!plans.length) {
+      setActivePlanId(null);
+      return;
+    }
+    if (!activePlanId || !plans.some((p) => p.id === activePlanId)) {
+      setActivePlanId(plans[0].id);
+    }
+  }, [plans]); // eslint-disable-line
+
   const activePlan = useMemo(
     () => plans.find((p) => p.id === activePlanId) || null,
     [plans, activePlanId]
   );
 
-  /* sets state keyed by exercise id */
+  /* Sets state per exercise */
   const [setsMap, setSetsMap] = useState(() =>
-    activePlan ? seedSets(activePlan.items || []) : {}
+    activePlan ? seedSets(activePlan.items) : {}
   );
 
-  /* reseed sets when plan or its items change */
+  /* Reseed sets when the selected plan changes */
   useEffect(() => {
-    setSetsMap(activePlan ? seedSets(activePlan.items || []) : {});
-  }, [activePlanId, plans]); // re-evaluate if plans change too
+    setSetsMap(activePlan ? seedSets(activePlan.items) : {});
+  }, [activePlanId]); // eslint-disable-line
 
-  /* ----- mutations ----- */
+  /* ----- set mutations ----- */
   function updateCell(exId, idx, field, value) {
     setSetsMap((m) => {
-      const arr = m[exId] ? [...m[exId]] : [];
-      arr[idx] = { ...arr[idx], [field]: value };
-      return { ...m, [exId]: arr };
+      const row = m[exId] ? [...m[exId]] : [];
+      row[idx] = { ...row[idx], [field]: value };
+      return { ...m, [exId]: row };
     });
   }
+
   function addSet(exId) {
     setSetsMap((m) => {
-      const arr = m[exId] ? [...m[exId]] : [];
-      arr.push({ kg: "", reps: "" });
-      return { ...m, [exId]: arr };
+      const row = m[exId] ? [...m[exId]] : [];
+      row.push({ kg: "", reps: "" });
+      return { ...m, [exId]: row };
     });
   }
+
   function removeSet(exId, idx) {
     setSetsMap((m) => {
-      const arr = (m[exId] || []).filter((_, i) => i !== idx);
-      return { ...m, [exId]: arr.length ? arr : [{ kg: "", reps: "" }] };
+      const row = (m[exId] || []).filter((_, i) => i !== idx);
+      return { ...m, [exId]: row.length ? row : [{ kg: "", reps: "" }] };
     });
   }
+
   function removeExercise(exId) {
     setSetsMap((m) => {
       const copy = { ...m };
       delete copy[exId];
       return copy;
     });
-    // visual-only removal in the session; does not modify saved plan
   }
 
   /* ----- end session: save whole workout ----- */
@@ -156,63 +170,73 @@ export default function Session() {
       {/* exercise list for the selected plan */}
       {activePlan && (activePlan.items || []).length > 0 ? (
         <div className="stack">
-          {(activePlan.items || []).map((ex) => (
-<div key={it.id} className="exercise-card">
-  <div className="exercise-header">
-    <div className="exercise-title">
-      {it.name} <span className="exercise-scheme">{it.sets}×{it.reps}</span>
-    </div>
+          {(activePlan.items || []).map((it) => (
+            <div key={it.id} className="exercise-card">
+              <div className="exercise-header">
+                <div className="exercise-title">
+                  {it.name}{" "}
+                  <span className="exercise-scheme">
+                    {it.sets}×{it.reps}
+                  </span>
+                </div>
 
-    <div className="exercise-actions">
-      <button className="chip" onClick={() => addSet(it.id)}>+ Add set</button>
-      <button
-        className="icon-x"
-        aria-label="Remove exercise"
-        onClick={() => removeExercise(it.id)}
-      >
-        ×
-      </button>
-    </div>
-  </div>
+                <div className="exercise-actions">
+                  <button className="chip" onClick={() => addSet(it.id)}>
+                    + Add set
+                  </button>
+                  <button
+                    className="icon-x"
+                    aria-label="Remove exercise"
+                    onClick={() => removeExercise(it.id)}
+                  >
+                    ×
+                  </button>
+                </div>
+              </div>
 
-  <div className="sets-col">
-    {(setsMap[it.id] || []).map((row, i) => (
-      <div key={i} className="inputs-row">
-        <div className="set-label">Set {String(i + 1).padStart(2, "0")}</div>
+              <div className="sets-col">
+                {(setsMap[it.id] || []).map((row, i) => (
+                  <div key={i} className="inputs-row">
+                    <div className="set-label">
+                      Set {String(i + 1).padStart(2, "0")}
+                    </div>
 
-        <div className="row-inputs">
-          <input
-            className="input"
-            placeholder="reps"
-            value={row.reps || ""}
-            onChange={(e) => updateCell(it.id, i, "reps", e.target.value)}
-          />
-          <input
-            className="input"
-            placeholder="kg"
-            value={row.kg || ""}
-            onChange={(e) => updateCell(it.id, i, "kg", e.target.value)}
-          />
-        </div>
+                    <div className="row-inputs">
+                      <input
+                        className="input"
+                        placeholder="reps"
+                        value={row.reps || ""}
+                        onChange={(e) =>
+                          updateCell(it.id, i, "reps", e.target.value)
+                        }
+                      />
+                      <input
+                        className="input"
+                        placeholder="kg"
+                        value={row.kg || ""}
+                        onChange={(e) =>
+                          updateCell(it.id, i, "kg", e.target.value)
+                        }
+                      />
+                    </div>
 
-        <button
-          className="icon-x sm"
-          aria-label={`Remove set ${i + 1}`}
-          onClick={() => removeSet(it.id, i)}
-        >
-          ×
-        </button>
-      </div>
-    ))}
-  </div>
-</div>
+                    <button
+                      className="icon-x sm"
+                      aria-label={`Remove set ${i + 1}`}
+                      onClick={() => removeSet(it.id, i)}
+                    >
+                      ×
+                    </button>
+                  </div>
+                ))}
+              </div>
+            </div>
           ))}
         </div>
       ) : (
         <div className="empty">This plan has no exercises yet.</div>
       )}
 
-      {/* End session */}
       {activePlan && (
         <div style={{ marginTop: 20 }}>
           <button className="btn primary wide" onClick={endSession}>
@@ -221,7 +245,6 @@ export default function Session() {
         </div>
       )}
 
-      {/* timer sheet */}
       {showTimer && (
         <RestTimer open={showTimer} onClose={() => setShowTimer(false)} />
       )}
