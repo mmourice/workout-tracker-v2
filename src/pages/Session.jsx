@@ -1,5 +1,4 @@
 import React, { useEffect, useMemo, useState } from "react";
-import Layout from "../components/Layout.jsx";
 import RestTimer from "../components/RestTimer.jsx";
 import { StopwatchIcon } from "../Icons.jsx";
 
@@ -40,27 +39,20 @@ function seedSets(items) {
   return obj;
 }
 
-/** Reusable pill button for actions (add / delete) */
-function ActionBtn({ kind = "add", className = "", children, ...rest }) {
-  const base = kind === "add" ? "add-set" : "delete-set";
-  return (
-    <button className={`${base} ${className}`.trim()} {...rest}>
-      {children}
-    </button>
-  );
-}
-
 export default function Session() {
   /* Rest timer */
   const [showTimer, setShowTimer] = useState(false);
 
   /* Plans + selection */
-  const [plans, setPlans] = useState(() => loadPlans());
+  const [plans] = useState(() => loadPlans());
   const planOptions = useMemo(
     () => plans.map((p) => ({ id: p.id, name: p.name })),
     [plans]
   );
-  const [activePlanId, setActivePlanId] = useState(planOptions[0]?.id || null);
+
+  const [activePlanId, setActivePlanId] = useState(
+    planOptions[0]?.id || null
+  );
 
   /* Keep activePlanId valid if plans list changes */
   useEffect(() => {
@@ -71,7 +63,8 @@ export default function Session() {
     if (!activePlanId || !plans.some((p) => p.id === activePlanId)) {
       setActivePlanId(plans[0].id);
     }
-  }, [plans]); // eslint-disable-line
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [plans]);
 
   const activePlan = useMemo(
     () => plans.find((p) => p.id === activePlanId) || null,
@@ -86,7 +79,8 @@ export default function Session() {
   /* Reseed sets when the selected plan changes */
   useEffect(() => {
     setSetsMap(activePlan ? seedSets(activePlan.items) : {});
-  }, [activePlanId]); // eslint-disable-line
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [activePlanId]);
 
   /* ----- set mutations ----- */
   function updateCell(exId, idx, field, value) {
@@ -96,6 +90,7 @@ export default function Session() {
       return { ...m, [exId]: row };
     });
   }
+
   function addSet(exId) {
     setSetsMap((m) => {
       const row = m[exId] ? [...m[exId]] : [];
@@ -103,19 +98,20 @@ export default function Session() {
       return { ...m, [exId]: row };
     });
   }
+
   function removeSet(exId, idx) {
     setSetsMap((m) => {
       const row = (m[exId] || []).filter((_, i) => i !== idx);
       return { ...m, [exId]: row.length ? row : [{ kg: "", reps: "" }] };
     });
   }
+
   function removeExercise(exId) {
     setSetsMap((m) => {
       const copy = { ...m };
       delete copy[exId];
       return copy;
     });
-    // visual-only removal in the session; does not modify saved plan
   }
 
   /* ----- end session: save whole workout ----- */
@@ -143,24 +139,15 @@ export default function Session() {
   }
 
   return (
-    <Layout
-      title="Session"
-      active="session"
-      headerRight={
-        <button
-          className="icon-btn"
-          aria-label="Rest timer"
-          onClick={() => setShowTimer(true)}
-        >
-          <StopwatchIcon />
-        </button>
-      }
-    >
-      {/* plan chips row (no page <h1> anymore, header handles title) */}
+    <div className="page">
+      <h1 className="title">Session</h1>
+
+      {/* plan chips row */}
       <div className="chip-row" style={{ marginBottom: 12, flexWrap: "wrap" }}>
         {planOptions.length === 0 && (
           <div className="empty">No plans yet. Add one in Plan page.</div>
         )}
+
         {planOptions.map((p) => (
           <button
             key={p.id}
@@ -170,6 +157,15 @@ export default function Session() {
             {p.name}
           </button>
         ))}
+
+        <button
+          className="timer-btn"
+          aria-label="Open rest timer"
+          onClick={() => setShowTimer(true)}
+          style={{ marginLeft: "auto" }}
+        >
+          <StopwatchIcon />
+        </button>
       </div>
 
       {/* exercise list for the selected plan */}
@@ -184,17 +180,21 @@ export default function Session() {
                     {it.sets}×{it.reps}
                   </span>
                 </div>
+
                 <div className="exercise-actions">
-                  <ActionBtn kind="add" onClick={() => addSet(it.id)}>
-  + Add set
-</ActionBtn>
-                  <ActionBtn
-  kind="delete"
-  aria-label="Remove exercise"
-  onClick={() => removeExercise(it.id)}
->
-  ×
-</ActionBtn>
+                  <button
+                    className="add-set"
+                    onClick={() => addSet(it.id)}
+                  >
+                    + Add set
+                  </button>
+                  <button
+                    className="delete-set"
+                    aria-label="Remove exercise"
+                    onClick={() => removeExercise(it.id)}
+                  >
+                    ×
+                  </button>
                 </div>
               </div>
 
@@ -224,14 +224,13 @@ export default function Session() {
                       />
                     </div>
 
-                    <ActionBtn
-  kind="delete"
-  className="sm"
-  aria-label={`Remove set ${i + 1}`}
-  onClick={() => removeSet(it.id, i)}
->
-  ×
-</ActionBtn>
+                    <button
+                      className="delete-set sm"
+                      aria-label={`Remove set ${i + 1}`}
+                      onClick={() => removeSet(it.id, i)}
+                    >
+                      ×
+                    </button>
                   </div>
                 ))}
               </div>
@@ -253,6 +252,6 @@ export default function Session() {
       {showTimer && (
         <RestTimer open={showTimer} onClose={() => setShowTimer(false)} />
       )}
-    </Layout>
+    </div>
   );
 }
