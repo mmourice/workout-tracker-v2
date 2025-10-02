@@ -1685,3 +1685,41 @@ input, select, textarea { font-size: 16px; }
 
 /* Optional: tighten default page margins now that we have shell */
 .page { padding: 0; }
+
+/* Highlight stopwatch */
+.timer-btn svg,
+.stopwatch-hit svg { color: #ff6600; }
+
+/* Unify Add / Delete action styles */
+button.add-set,
+button.delete-set {
+  border: 1px solid #ff6600;
+  background: transparent;
+  color: #ff6600;
+  border-radius: 22px;
+  padding: 6px 14px;
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 1;
+  transition: background .2s ease, color .2s ease, opacity .2s ease;
+}
+button.add-set:hover,
+button.delete-set:hover {
+  background: #ff6600;
+  color: #fff;
+}
+button.delete-set { /* subtle difference if you want */
+  opacity: .9;
+}
+button.delete-set.sm {
+  padding: 4px 10px;
+  font-size: 13px;
+  border-radius: 16px;
+}
+
+/* Bigger label on End Session */
+button.end-session {
+  font-size: 18px;
+  font-weight: 700;
+  letter-spacing: .3px;
+}
