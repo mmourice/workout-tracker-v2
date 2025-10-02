@@ -1,5 +1,6 @@
 import React from "react";
-import { Routes, Route, Link } from "react-router-dom";
+import { Routes, Route, Link, Navigate } from "react-router-dom";
+import Layout from "./components/Layout.jsx";
 import Session from "./pages/Session.jsx";
 import Plan from "./pages/Plan.jsx";
 import Exercises from "./pages/Exercises.jsx";
@@ -14,17 +15,19 @@ function Home() {
   );
 
   return (
-    <div className="home hero">
-      <h1 className="hero-title">Workout Tracker</h1>
+    <Layout title="Workout Tracker" active="home">
+      <div className="home hero">
+        <h1 className="hero-title">Workout Tracker</h1>
 
-      <nav className="stack-nav">
-        <NavTile to="/session">Session</NavTile>
-        <NavTile to="/plan">Plan</NavTile>
-        <NavTile to="/exercises">Exercises</NavTile>
-        <NavTile to="/history">History</NavTile>
-        <NavTile to="/settings">Settings</NavTile>
-      </nav>
-    </div>
+        <nav className="stack-nav">
+          <NavTile to="/session">Session</NavTile>
+          <NavTile to="/plan">Plan</NavTile>
+          <NavTile to="/exercises">Exercises</NavTile>
+          <NavTile to="/history">History</NavTile>
+          <NavTile to="/settings">Settings</NavTile>
+        </nav>
+      </div>
+    </Layout>
   );
 }
 
@@ -37,7 +40,8 @@ export default function App() {
       <Route path="/exercises" element={<Exercises />} />
       <Route path="/history" element={<History />} />
       <Route path="/settings" element={<Settings />} />
-      <Route path="*" element={<Home />} />
+      {/* Fallback: send unknown paths to home */}
+      <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   );
 }
