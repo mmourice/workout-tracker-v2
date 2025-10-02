@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo, useState } from "react";
+import Layout from "../components/Layout.jsx";
 
 /* =========================================
    Data & storage helpers
@@ -25,13 +26,10 @@ const DEFAULTS = {
     "Incline Dumbbell Press",
   ],
   Shoulders: [
-    "Lat Pulldown - wide grip",
-    "Reverse Pulldown - medium grip",
-    "Cable Seated Row",
-    "Back Extension",
-    "Cable Crossover (Low to High)",
-    "Cable Crossover (High to Low)",
-    "Incline Dumbbell Press",
+    "Lateral Raise",
+    "Seated Dumbbell Press",
+    "Face Pull",
+    "Cable Lateral Raise",
   ],
   Legs: [],
   Arms: [],
@@ -46,16 +44,12 @@ function loadExercises() {
     if (raw) return JSON.parse(raw);
   } catch {}
   // seed once
-  try {
-    localStorage.setItem("wt_exercises", JSON.stringify(DEFAULTS));
-  } catch {}
+  try { localStorage.setItem("wt_exercises", JSON.stringify(DEFAULTS)); } catch {}
   return DEFAULTS;
 }
 
 function saveExercises(obj) {
-  try {
-    localStorage.setItem("wt_exercises", JSON.stringify(obj));
-  } catch {}
+  try { localStorage.setItem("wt_exercises", JSON.stringify(obj)); } catch {}
 }
 
 /* =========================================
@@ -92,9 +86,15 @@ export default function Exercises() {
   const [newLink, setNewLink] = useState("");
 
   // persist on change
+  useEffect(() => { saveExercises(db); }, [db]);
+
+  // lock scroll when sheet is open
   useEffect(() => {
-    saveExercises(db);
-  }, [db]);
+    if (!showAdd) return;
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => { document.body.style.overflow = prev; };
+  }, [showAdd]);
 
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
@@ -124,7 +124,7 @@ export default function Exercises() {
       return { ...prev, [newGroup]: [...list] };
     });
 
-    // optional: store link somewhere later; for now we keep link in future schema
+    // keep link for future schema; cleared for now
     setNewName("");
     setNewGroup(newGroup);
     setNewLink("");
@@ -132,9 +132,7 @@ export default function Exercises() {
   }
 
   return (
-    <div className="page">
-      <h1 className="title">Exercises</h1>
-
+    <Layout title="Exercises" active="exercises">
       <div className="ex-toolbar">
         <input
           className="input search"
@@ -178,7 +176,7 @@ export default function Exercises() {
         ))}
       </div>
 
-      {/* Add Exercise – full-width bottom sheet with a single card that contains all inputs */}
+      {/* Add Exercise – bottom sheet with single card holding all inputs */}
       <Sheet open={showAdd} onClose={() => setShowAdd(false)} titleId="add-ex-title">
         <h3 id="add-ex-title" className="sheet-title">Add Exercise</h3>
 
@@ -235,6 +233,6 @@ export default function Exercises() {
           </div>
         </form>
       </Sheet>
-    </div>
+    </Layout>
   );
 }
