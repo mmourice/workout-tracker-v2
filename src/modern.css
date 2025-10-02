@@ -1514,3 +1514,80 @@ input, select, textarea { font-size: 16px; }
 @media (max-width: 360px){
   .row-inputs{ grid-template-columns: 1fr; }
 }
+
+/* ==== Session – Exercise Card ==== */
+.exercise-card {
+  position: relative;
+  margin: 16px 0;
+  padding: 18px 16px;
+  border-radius: 18px;
+  background: radial-gradient(120% 140% at 0% 0%, #161616 0%, #0f0f0f 60%);
+  border: 1px solid rgba(255,255,255,0.06);
+  box-shadow: 0 10px 30px rgba(0,0,0,0.35), inset 0 1px 0 rgba(255,255,255,0.04);
+}
+
+.exercise-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 14px;
+}
+
+.exercise-title {
+  font-size: 22px;
+  font-weight: 800;
+  letter-spacing: -0.2px;
+  line-height: 1.1;
+  color: #fff;
+  flex: 1 1 auto;
+  min-width: 0;             /* allow ellipsis */
+}
+
+.exercise-title .exercise-scheme {
+  margin-left: 8px;
+  font-weight: 700;
+  color: #cfcfcf;
+  opacity: 0.9;
+}
+
+.exercise-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+/* reuse your chip & icon-x look */
+.exercise-card .chip { padding: 10px 14px; }
+.exercise-card .icon-x { width: 36px; height: 36px; }
+
+/* Grid of set rows inside a card */
+.sets-col {
+  display: grid;
+  gap: 10px;
+}
+
+/* Each row: label | inputs | small X */
+.inputs-row {
+  display: grid;
+  grid-template-columns: auto 1fr auto; /* label | inputs | x */
+  gap: 10px;
+  align-items: center;
+}
+
+.set-label {
+  font-weight: 700;
+  color: #eaeaea;
+  width: 78px;               /* keeps column aligned */
+}
+
+.row-inputs {
+  display: grid;
+  grid-template-columns: 1fr 1fr; /* reps | kg */
+  gap: 10px;
+}
+
+/* mobile spacing tweak */
+@media (min-width: 560px) {
+  .exercise-card { padding: 20px; }
+  .exercise-title { font-size: 24px; }
+}
