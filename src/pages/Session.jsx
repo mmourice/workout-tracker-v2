@@ -157,69 +157,55 @@ export default function Session() {
       {activePlan && (activePlan.items || []).length > 0 ? (
         <div className="stack">
           {(activePlan.items || []).map((ex) => (
-            <div key={ex.id} className="exercise-card">
-              <div className="exercise-header">
-                <div className="exercise-title">
-                  {ex.name}{" "}
-                  <span className="exercise-scheme">
-                    {ex.sets}×{ex.reps}
-                  </span>
-                </div>
+<div key={it.id} className="exercise-card">
+  <div className="exercise-header">
+    <div className="exercise-title">
+      {it.name} <span className="exercise-scheme">{it.sets}×{it.reps}</span>
+    </div>
 
-                <div className="exercise-actions">
-                  <button className="chip" onClick={() => addSet(ex.id)}>
-                    + Add set
-                  </button>
-                  <button
-                    className="icon-x"
-                    aria-label="Remove exercise"
-                    onClick={() => removeExercise(ex.id)}
-                  >
-                    ×
-                  </button>
-                </div>
-              </div>
+    <div className="exercise-actions">
+      <button className="chip" onClick={() => addSet(it.id)}>+ Add set</button>
+      <button
+        className="icon-x"
+        aria-label="Remove exercise"
+        onClick={() => removeExercise(it.id)}
+      >
+        ×
+      </button>
+    </div>
+  </div>
 
-              <div className="sets-col">
-                {(setsMap[ex.id] || []).map((row, i) => (
-                  <div key={i} className="inputs-row">
-                    <label className="set-label">
-                      Set {String(i + 1).padStart(2, "0")}
-                    </label>
+  <div className="sets-col">
+    {(setsMap[it.id] || []).map((row, i) => (
+      <div key={i} className="inputs-row">
+        <div className="set-label">Set {String(i + 1).padStart(2, "0")}</div>
 
-                    {/* reps */}
-                    <input
-                      className="input"
-                      placeholder="reps"
-                      value={row.reps ?? ""}
-                      onChange={(e) =>
-                        updateCell(ex.id, i, "reps", e.target.value)
-                      }
-                    />
+        <div className="row-inputs">
+          <input
+            className="input"
+            placeholder="reps"
+            value={row.reps || ""}
+            onChange={(e) => updateCell(it.id, i, "reps", e.target.value)}
+          />
+          <input
+            className="input"
+            placeholder="kg"
+            value={row.kg || ""}
+            onChange={(e) => updateCell(it.id, i, "kg", e.target.value)}
+          />
+        </div>
 
-                    <div className="spacer" />
-
-                    {/* kg */}
-                    <input
-                      className="input"
-                      placeholder="kg"
-                      value={row.kg ?? ""}
-                      onChange={(e) =>
-                        updateCell(ex.id, i, "kg", e.target.value)
-                      }
-                    />
-
-                    <button
-                      className="icon-x sm"
-                      aria-label={`Remove set ${i + 1}`}
-                      onClick={() => removeSet(ex.id, i)}
-                    >
-                      ×
-                    </button>
-                  </div>
-                ))}
-              </div>
-            </div>
+        <button
+          className="icon-x sm"
+          aria-label={`Remove set ${i + 1}`}
+          onClick={() => removeSet(it.id, i)}
+        >
+          ×
+        </button>
+      </div>
+    ))}
+  </div>
+</div>
           ))}
         </div>
       ) : (
