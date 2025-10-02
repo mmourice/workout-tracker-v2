@@ -1466,3 +1466,51 @@ input, select, textarea { font-size: 16px; }
   -webkit-box-orient: vertical;
   overflow: hidden;
 }
+
+/* --- Session: set rows --- */
+.inputs-row{
+  display:grid;
+  grid-template-columns: auto 1fr auto; /* label | inputs | remove */
+  gap:12px;
+  align-items:center;
+  padding:10px 0;
+}
+
+.set-label{
+  width:72px;
+  font-weight:600;
+  color:var(--muted-2);
+}
+
+.row-inputs{
+  display:grid;
+  grid-template-columns: 1fr 1fr; /* reps | kg */
+  gap:12px;
+}
+
+.inputs-row .input{
+  height:44px;
+}
+
+/* remove button look (no bubble) */
+.icon-x,
+.icon-x.sm{
+  background: transparent !important;
+  border: 0 !important;
+  box-shadow: none !important;
+  color: var(--accent);
+  font-size:20px;
+  line-height:1;
+  padding:0 4px;
+  cursor:pointer;
+}
+.icon-x.sm{ font-size:18px; }
+.icon-x:hover{ filter:brightness(1.1); }
+
+/* keep +Add set chip tidy next to title */
+.exercise-actions .chip{ margin-right:8px; }
+
+/* small screens: stack inputs if <360px wide */
+@media (max-width: 360px){
+  .row-inputs{ grid-template-columns: 1fr; }
+}
