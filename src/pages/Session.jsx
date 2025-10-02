@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo, useState } from "react";
+import Layout from "../components/Layout.jsx";
 import RestTimer from "../components/RestTimer.jsx";
 import { StopwatchIcon } from "../Icons.jsx";
 
@@ -15,7 +16,6 @@ function loadPlans() {
     return [];
   }
 }
-
 function loadLogs() {
   try {
     const raw = localStorage.getItem(LOGS_KEY);
@@ -50,10 +50,7 @@ export default function Session() {
     () => plans.map((p) => ({ id: p.id, name: p.name })),
     [plans]
   );
-
-  const [activePlanId, setActivePlanId] = useState(
-    planOptions[0]?.id || null
-  );
+  const [activePlanId, setActivePlanId] = useState(planOptions[0]?.id || null);
 
   /* Keep activePlanId valid if plans list changes */
   useEffect(() => {
@@ -89,7 +86,6 @@ export default function Session() {
       return { ...m, [exId]: row };
     });
   }
-
   function addSet(exId) {
     setSetsMap((m) => {
       const row = m[exId] ? [...m[exId]] : [];
@@ -97,20 +93,19 @@ export default function Session() {
       return { ...m, [exId]: row };
     });
   }
-
   function removeSet(exId, idx) {
     setSetsMap((m) => {
       const row = (m[exId] || []).filter((_, i) => i !== idx);
       return { ...m, [exId]: row.length ? row : [{ kg: "", reps: "" }] };
     });
   }
-
   function removeExercise(exId) {
     setSetsMap((m) => {
       const copy = { ...m };
       delete copy[exId];
       return copy;
     });
+    // visual-only removal in the session; does not modify saved plan
   }
 
   /* ----- end session: save whole workout ----- */
@@ -138,15 +133,24 @@ export default function Session() {
   }
 
   return (
-    <div className="page">
-      <h1 className="title">Session</h1>
-
-      {/* plan chips row */}
+    <Layout
+      title="Session"
+      active="session"
+      headerRight={
+        <button
+          className="icon-btn"
+          aria-label="Rest timer"
+          onClick={() => setShowTimer(true)}
+        >
+          <StopwatchIcon />
+        </button>
+      }
+    >
+      {/* plan chips row (no page <h1> anymore, header handles title) */}
       <div className="chip-row" style={{ marginBottom: 12, flexWrap: "wrap" }}>
         {planOptions.length === 0 && (
           <div className="empty">No plans yet. Add one in Plan page.</div>
         )}
-
         {planOptions.map((p) => (
           <button
             key={p.id}
@@ -156,15 +160,6 @@ export default function Session() {
             {p.name}
           </button>
         ))}
-
-        <button
-          className="timer-btn"
-          aria-label="Open rest timer"
-          onClick={() => setShowTimer(true)}
-          style={{ marginLeft: "auto" }}
-        >
-          <StopwatchIcon />
-        </button>
       </div>
 
       {/* exercise list for the selected plan */}
@@ -179,7 +174,6 @@ export default function Session() {
                     {it.sets}×{it.reps}
                   </span>
                 </div>
-
                 <div className="exercise-actions">
                   <button className="chip" onClick={() => addSet(it.id)}>
                     + Add set
@@ -248,6 +242,6 @@ export default function Session() {
       {showTimer && (
         <RestTimer open={showTimer} onClose={() => setShowTimer(false)} />
       )}
-    </div>
+    </Layout>
   );
 }
