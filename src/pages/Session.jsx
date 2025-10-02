@@ -40,6 +40,16 @@ function seedSets(items) {
   return obj;
 }
 
+/** Reusable pill button for actions (add / delete) */
+function ActionBtn({ kind = "add", className = "", children, ...rest }) {
+  const base = kind === "add" ? "add-set" : "delete-set";
+  return (
+    <button className={`${base} ${className}`.trim()} {...rest}>
+      {children}
+    </button>
+  );
+}
+
 export default function Session() {
   /* Rest timer */
   const [showTimer, setShowTimer] = useState(false);
@@ -175,16 +185,16 @@ export default function Session() {
                   </span>
                 </div>
                 <div className="exercise-actions">
-                  <button className="chip" onClick={() => addSet(it.id)}>
-                    + Add set
-                  </button>
-                  <button
-                    className="icon-x"
-                    aria-label="Remove exercise"
-                    onClick={() => removeExercise(it.id)}
-                  >
-                    ×
-                  </button>
+                  <ActionBtn kind="add" onClick={() => addSet(it.id)}>
+  + Add set
+</ActionBtn>
+                  <ActionBtn
+  kind="delete"
+  aria-label="Remove exercise"
+  onClick={() => removeExercise(it.id)}
+>
+  ×
+</ActionBtn>
                 </div>
               </div>
 
@@ -214,13 +224,14 @@ export default function Session() {
                       />
                     </div>
 
-                    <button
-                      className="icon-x sm"
-                      aria-label={`Remove set ${i + 1}`}
-                      onClick={() => removeSet(it.id, i)}
-                    >
-                      ×
-                    </button>
+                    <ActionBtn
+  kind="delete"
+  className="sm"
+  aria-label={`Remove set ${i + 1}`}
+  onClick={() => removeSet(it.id, i)}
+>
+  ×
+</ActionBtn>
                   </div>
                 ))}
               </div>
@@ -233,7 +244,7 @@ export default function Session() {
 
       {activePlan && (
         <div style={{ marginTop: 20 }}>
-          <button className="btn primary wide" onClick={endSession}>
+          <button className="btn primary wide end-session" onClick={endSession}>
             End Session
           </button>
         </div>
