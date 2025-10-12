@@ -3,7 +3,7 @@ import React from "react";
 import { createRoot } from "react-dom/client";
 import { HashRouter } from "react-router-dom";
 import App from "./App.jsx";
-import "./styles.css"; // <- keep this name; see step 1
+import "./modern.css"; // <- keep this name; see step 1
 
 function ErrorBoundary({ children }) {
   const [error, setError] = React.useState(null);
