@@ -1723,3 +1723,21 @@ button.end-session {
   font-weight: 700;
   letter-spacing: .3px;
 }
+
+
+/* ===== App shell ===== */
+.app { min-height: 100dvh; background:#0e0e11; color:#eaeaea; display:flex; flex-direction:column; }
+.app-header { position: sticky; top: 0; z-index: 50; height: 56px; display:flex; align-items:center; gap:12px; padding:0 16px; background:linear-gradient(180deg,#111218, #0e0e11 60%); border-bottom:1px solid rgba(255,255,255,0.06); }
+.home-btn { width:36px; height:36px; display:grid; place-items:center; border-radius:10px; background:transparent; border:1px solid rgba(255,255,255,0.12); color:#fff; }
+.app-title { margin:0; flex:1; text-align:center; font-size:20px; font-weight:700; letter-spacing:.3px; }
+.head-spacer { width:36px; } /* keeps title centered */
+
+.app-body { flex:1; padding:16px; padding-bottom:92px; } /* space for tabbar */
+
+.app-tabbar { position: fixed; left: 0; right: 0; bottom: 0; height: 72px; display:flex; justify-content:space-around; align-items:center; gap:8px; background:rgba(16,16,19,0.92); backdrop-filter: blur(10px); border-top:1px solid rgba(255,255,255,0.08); z-index:60; }
+.app-tabbar .tab { min-width:64px; height:48px; padding:6px 10px; border-radius:12px; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:4px; color:#cfcfcf; text-decoration:none; border:1px solid transparent; }
+.app-tabbar .tab.active, .app-tabbar .tab[aria-current="page"] { color:#111; background:#ff6a00; border-color:#ff6a00; }
+.app-tabbar .ico { font-size:18px; line-height:1; }
+
+/* Optional: remove duplicate page H1s since header shows title */
+.page > .title { display:none; }
