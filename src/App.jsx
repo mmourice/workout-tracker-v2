@@ -11,15 +11,15 @@ import Settings from "./pages/Settings.jsx";
 export default function App() {
   return (
     <Routes>
-      {/* All pages render inside Layout -> <Outlet/> */}
+      {/* All pages render inside Layout via <Outlet/> */}
       <Route element={<Layout />}>
-        <Route index element={<Session />} />             {/* default: / -> Session */}
+        <Route index element={<Session />} />            {/* / -> Session */}
         <Route path="/session" element={<Session />} />
         <Route path="/plan" element={<Plan />} />
         <Route path="/exercises" element={<Exercises />} />
         <Route path="/history" element={<History />} />
         <Route path="/settings" element={<Settings />} />
-        <Route path="*" element={<Session />} />          {/* catch-all */}
+        <Route path="*" element={<Session />} />
       </Route>
     </Routes>
   );
