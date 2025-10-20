@@ -1,53 +1,52 @@
 import React from "react";
-import { NavLink, Link } from "react-router-dom";
-import { HomeIcon, SessionIcon, PlanIcon, ExercisesIcon, HistoryIcon, SettingsIcon } from "../Icons.jsx";
+import { NavLink, Outlet, useLocation, Link } from "react-router-dom";
 
-/**
- * App shell: header (home + centered title + optional right slot),
- * main content, and bottom tab bar.
- *
- * Props:
- * - title: string in the header center
- * - active: "session" | "plan" | "exercises" | "history" | "settings"
- * - headerRight: optional React node (e.g., stopwatch button)
- */
-export default function Layout({ title, active, headerRight, children }) {
+const TITLE_MAP = {
+  "/": "Workout Tracker",
+  "/session": "Session",
+  "/plan": "Plan",
+  "/exercises": "Exercises",
+  "/history": "History",
+  "/settings": "Settings",
+};
+
+export default function Layout() {
+  const { pathname } = useLocation();
+  const title =
+    TITLE_MAP[pathname] ??
+    (pathname.startsWith("/session") ? "Session" :
+     pathname.startsWith("/plan") ? "Plan" :
+     pathname.startsWith("/exercises") ? "Exercises" :
+     pathname.startsWith("/history") ? "History" :
+     pathname.startsWith("/settings") ? "Settings" : "Workout Tracker");
+
   return (
     <div className="app-shell">
-      {/* Header */}
       <header className="app-header">
-        <Link to="/" className="home-btn" aria-label="Home">
-          <HomeIcon />
-        </Link>
-
-        <div className="header-title" role="heading" aria-level={1}>
-          {title}
-        </div>
-
-        <div className="header-right">
-          {headerRight ?? null}
-        </div>
+        <Link to="/" className="home-btn" aria-label="Home">⌂</Link>
+        <h1 className="app-title">{title}</h1>
+        <div className="header-right" />
       </header>
 
-      {/* Main content */}
-      <main className="app-main">{children}</main>
+      <main className="app-main">
+        <Outlet />
+      </main>
 
-      {/* Tab bar */}
-      <nav className="tabbar" aria-label="Primary">
-        <NavLink to="/session" className={({isActive}) => "tab-item " + ((active==="session"||isActive) ? "tab-active" : "")}>
-          <SessionIcon /><span>Session</span>
+      <nav className="tabbar">
+        <NavLink end to="/session" className="tab">
+          <span className="tab-ico">🕒</span><span className="tab-txt">Session</span>
         </NavLink>
-        <NavLink to="/plan" className={({isActive}) => "tab-item " + ((active==="plan"||isActive) ? "tab-active" : "")}>
-          <PlanIcon /><span>Plan</span>
+        <NavLink end to="/plan" className="tab">
+          <span className="tab-ico">📋</span><span className="tab-txt">Plan</span>
         </NavLink>
-        <NavLink to="/exercises" className={({isActive}) => "tab-item " + ((active==="exercises"||isActive) ? "tab-active" : "")}>
-          <ExercisesIcon /><span>Exercises</span>
+        <NavLink end to="/exercises" className="tab">
+          <span className="tab-ico">🏋️</span><span className="tab-txt">Exercises</span>
         </NavLink>
-        <NavLink to="/history" className={({isActive}) => "tab-item " + ((active==="history"||isActive) ? "tab-active" : "")}>
-          <HistoryIcon /><span>History</span>
+        <NavLink end to="/history" className="tab">
+          <span className="tab-ico">🕰️</span><span className="tab-txt">History</span>
         </NavLink>
-        <NavLink to="/settings" className={({isActive}) => "tab-item " + ((active==="settings"||isActive) ? "tab-active" : "")}>
-          <SettingsIcon /><span>Settings</span>
+        <NavLink end to="/settings" className="tab">
+          <span className="tab-ico">⚙️</span><span className="tab-txt">Settings</span>
         </NavLink>
       </nav>
     </div>
