@@ -2,6 +2,7 @@
 import React from "react";
 import { Routes, Route } from "react-router-dom";
 import Layout from "./components/Layout.jsx";
+import Home from "./pages/Home.jsx";
 
 import Home from "./pages/Home.jsx";
 import Session from "./pages/Session.jsx";
